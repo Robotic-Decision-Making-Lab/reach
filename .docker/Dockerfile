@@ -4,7 +4,6 @@ FROM ros:$ROS_DISTRO-ros-base as ci
 ENV DEBIAN_FRONTEND=noninteractive
 WORKDIR /root/ws_ros
 
-# Update to be your project's name
 ENV PROJECT_NAME=reach
 
 COPY . src/$PROJECT_NAME
@@ -24,6 +23,9 @@ RUN apt-get -q update \
     && apt-get autoremove -y \
     && apt-get clean -y \
     && rm -rf /var/lib/apt/lists/*
+
+# Import external repositories
+RUN vcs import src < src/$PROJECT_NAME/ros2.repos
 
 # Install all ROS dependencies needed for CI
 RUN apt-get -q update \
@@ -65,8 +67,7 @@ RUN python3 -m venv --system-site-packages $VIRTUAL_ENV \
     && touch .venv/COLCON_IGNORE
 ENV PATH="$VIRTUAL_ENV/bin:$PATH"
 
-# Uncomment to download and install external repos used by the project
-# RUN vcs import src < src/$PROJECT_NAME/ros2.repos
+RUN vcs import src < src/$PROJECT_NAME/ros2.repos
 
 # Install all ROS dependencies
 WORKDIR $USER_WORKSPACE
