@@ -23,14 +23,14 @@
 // ACTION OF CONTRACT, TORT, OR OTHERWISE, ARISING FROM, OUT OF, OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#include "bravo_hardware/hardware.hpp"
+#include "reach_hardware/bravo_7_hardware.hpp"
 
 #include <limits>
 
 #include "hardware_interface/types/hardware_interface_type_values.hpp"
 #include "rclcpp/rclcpp.hpp"
 
-namespace bravo::hardware
+namespace reach::hardware
 {
 
 namespace
@@ -47,12 +47,12 @@ auto convert_current_to_torque(float c, float Kt, float Gr = 120.0) -> float { r
 
 }  // namespace
 
-auto BravoHardware::on_init(const hardware_interface::HardwareInfo & info) -> hardware_interface::CallbackReturn
+auto Bravo7Hardware::on_init(const hardware_interface::HardwareInfo & info) -> hardware_interface::CallbackReturn
 {
-  RCLCPP_INFO(logger_, "Initializing BravoHardware system interface");  // NOLINT
+  RCLCPP_INFO(logger_, "Initializing Bravo7Hardware system interface");  // NOLINT
 
   if (hardware_interface::SystemInterface::on_init(info) != hardware_interface::CallbackReturn::SUCCESS) {
-    RCLCPP_INFO(logger_, "Failed to initialize BravoHardware system interface");  // NOLINT
+    RCLCPP_INFO(logger_, "Failed to initialize Bravo7Hardware system interface");  // NOLINT
     return hardware_interface::CallbackReturn::ERROR;
   }
 
@@ -83,9 +83,7 @@ auto BravoHardware::on_init(const hardware_interface::HardwareInfo & info) -> ha
   for (const hardware_interface::ComponentInfo & joint : info_.joints) {
     if (joint.command_interfaces.size() != 3) {
       RCLCPP_ERROR(  // NOLINT
-        logger_,
-        "Joint '%s' has %zu command interfaces, expected 3",
-        joint.name.c_str(),
+        logger_, "Joint '%s' has %zu command interfaces, expected 3", joint.name.c_str(),
         joint.command_interfaces.size());
       return hardware_interface::CallbackReturn::ERROR;
     }
@@ -96,22 +94,15 @@ auto BravoHardware::on_init(const hardware_interface::HardwareInfo & info) -> ha
 
     if (!command_interface_valid) {
       RCLCPP_ERROR(  // NOLINT
-        logger_,
-        "Joint '%s' has command interface '%s', expected '%s', '%s', or '%s'",
-        joint.name.c_str(),
-        joint.command_interfaces.front().name.c_str(),
-        hardware_interface::HW_IF_POSITION,
-        hardware_interface::HW_IF_VELOCITY,
-        hardware_interface::HW_IF_EFFORT);
+        logger_, "Joint '%s' has command interface '%s', expected '%s', '%s', or '%s'", joint.name.c_str(),
+        joint.command_interfaces.front().name.c_str(), hardware_interface::HW_IF_POSITION,
+        hardware_interface::HW_IF_VELOCITY, hardware_interface::HW_IF_EFFORT);
       return hardware_interface::CallbackReturn::ERROR;
     }
 
     if (joint.state_interfaces.size() != 3) {
       RCLCPP_ERROR(  // NOLINT
-        logger_,
-        "Joint '%s' has %zu state interfaces, expected 3",
-        joint.name.c_str(),
-        joint.state_interfaces.size());
+        logger_, "Joint '%s' has %zu state interfaces, expected 3", joint.name.c_str(), joint.state_interfaces.size());
       return hardware_interface::CallbackReturn::ERROR;
     }
 
@@ -121,23 +112,19 @@ auto BravoHardware::on_init(const hardware_interface::HardwareInfo & info) -> ha
 
     if (!state_interface_valid) {
       RCLCPP_ERROR(  // NOLINT
-        logger_,
-        "Joint '%s' has state interface '%s', expected '%s', '%s', or '%s'",
-        joint.name.c_str(),
-        joint.state_interfaces.front().name.c_str(),
-        hardware_interface::HW_IF_POSITION,
-        hardware_interface::HW_IF_VELOCITY,
-        hardware_interface::HW_IF_EFFORT);
+        logger_, "Joint '%s' has state interface '%s', expected '%s', '%s', or '%s'", joint.name.c_str(),
+        joint.state_interfaces.front().name.c_str(), hardware_interface::HW_IF_POSITION,
+        hardware_interface::HW_IF_VELOCITY, hardware_interface::HW_IF_EFFORT);
       return hardware_interface::CallbackReturn::ERROR;
     }
   }
 
-  RCLCPP_INFO(logger_, "Successfully initialized BravoHardware system interface");  // NOLINT
+  RCLCPP_INFO(logger_, "Successfully initialized Bravo7Hardware system interface");  // NOLINT
 
   return hardware_interface::CallbackReturn::SUCCESS;
 }
 
-auto BravoHardware::on_configure(const rclcpp_lifecycle::State & /* previous_state */)
+auto Bravo7Hardware::on_configure(const rclcpp_lifecycle::State & /* previous_state */)
   -> hardware_interface::CallbackReturn
 {
   // Use a multi-worker configuration
@@ -177,23 +164,22 @@ auto BravoHardware::on_configure(const rclcpp_lifecycle::State & /* previous_sta
   // Configure the state requests
   for (std::size_t i = 1; i < hw_states_positions_.size() + 1; ++i) {
     bravo_->request_at_rate(
-      {libreach::PacketId::POSITION, libreach::PacketId::VELOCITY, libreach::PacketId::CURRENT},
-      i,
+      {libreach::PacketId::POSITION, libreach::PacketId::VELOCITY, libreach::PacketId::CURRENT}, i,
       state_request_rate_);
   }
 
-  RCLCPP_INFO(logger_, "Successfully configured the BravoHardware system interface");  // NOLINT
+  RCLCPP_INFO(logger_, "Successfully configured the Bravo7Hardware system interface");  // NOLINT
 
   return hardware_interface::CallbackReturn::SUCCESS;
 }
 
-auto BravoHardware::on_cleanup(const rclcpp_lifecycle::State & /* previous_state */)
+auto Bravo7Hardware::on_cleanup(const rclcpp_lifecycle::State & /* previous_state */)
   -> hardware_interface::CallbackReturn
 {
   return hardware_interface::CallbackReturn::SUCCESS;
 }
 
-auto BravoHardware::prepare_command_mode_switch(
+auto Bravo7Hardware::prepare_command_mode_switch(
   const std::vector<std::string> & start_interfaces,
   const std::vector<std::string> & /* stop_interfaces */) -> hardware_interface::return_type
 {
@@ -209,9 +195,7 @@ auto BravoHardware::prepare_command_mode_switch(
         new_modes.emplace_back(libreach::Mode::CURRENT);
       } else {
         RCLCPP_WARN(  // NOLINT
-          logger_,
-          "Unknown command mode for joint '%s': '%s'. Setting mode to 'STANDBY'",
-          joint.name.c_str(),
+          logger_, "Unknown command mode for joint '%s': '%s'. Setting mode to 'STANDBY'", joint.name.c_str(),
           key.c_str());
         new_modes.emplace_back(libreach::Mode::STANDBY);
       }
@@ -227,7 +211,7 @@ auto BravoHardware::prepare_command_mode_switch(
   return hardware_interface::return_type::OK;
 }
 
-auto BravoHardware::perform_command_mode_switch(
+auto Bravo7Hardware::perform_command_mode_switch(
   const std::vector<std::string> & /* start_interfaces */,
   const std::vector<std::string> & /* stop_interfaces */) -> hardware_interface::return_type
 {
@@ -242,7 +226,7 @@ auto BravoHardware::perform_command_mode_switch(
   return hardware_interface::return_type::OK;
 }
 
-auto BravoHardware::export_state_interfaces() -> std::vector<hardware_interface::StateInterface>
+auto Bravo7Hardware::export_state_interfaces() -> std::vector<hardware_interface::StateInterface>
 {
   std::vector<hardware_interface::StateInterface> state_interfaces;
 
@@ -255,7 +239,7 @@ auto BravoHardware::export_state_interfaces() -> std::vector<hardware_interface:
   return state_interfaces;
 }
 
-auto BravoHardware::export_command_interfaces() -> std::vector<hardware_interface::CommandInterface>
+auto Bravo7Hardware::export_command_interfaces() -> std::vector<hardware_interface::CommandInterface>
 {
   std::vector<hardware_interface::CommandInterface> cmd_interfaces;
 
@@ -268,21 +252,21 @@ auto BravoHardware::export_command_interfaces() -> std::vector<hardware_interfac
   return cmd_interfaces;
 }
 
-auto BravoHardware::on_activate(const rclcpp_lifecycle::State & /* previous_state */)
+auto Bravo7Hardware::on_activate(const rclcpp_lifecycle::State & /* previous_state */)
   -> hardware_interface::CallbackReturn
 {
   bravo_->set_mode(static_cast<std::uint8_t>(libreach::Bravo7DeviceId::ALL_JOINTS), libreach::Mode::STANDBY);
   return hardware_interface::CallbackReturn::SUCCESS;
 }
 
-auto BravoHardware::on_deactivate(const rclcpp_lifecycle::State & /* previous_state */)
+auto Bravo7Hardware::on_deactivate(const rclcpp_lifecycle::State & /* previous_state */)
   -> hardware_interface::CallbackReturn
 {
   bravo_->set_mode(static_cast<std::uint8_t>(libreach::Bravo7DeviceId::ALL_JOINTS), libreach::Mode::DISABLE);
   return hardware_interface::CallbackReturn::SUCCESS;
 }
 
-auto BravoHardware::read(const rclcpp::Time & /* time */, const rclcpp::Duration & /* period */)
+auto Bravo7Hardware::read(const rclcpp::Time & /* time */, const rclcpp::Duration & /* period */)
   -> hardware_interface::return_type
 {
   const std::scoped_lock lock{position_state_lock_, velocity_state_lock_, torque_state_lock_};
@@ -294,7 +278,7 @@ auto BravoHardware::read(const rclcpp::Time & /* time */, const rclcpp::Duration
   return hardware_interface::return_type::OK;
 }
 
-auto BravoHardware::write(const rclcpp::Time & /* time */, const rclcpp::Duration & /* period */)
+auto Bravo7Hardware::write(const rclcpp::Time & /* time */, const rclcpp::Duration & /* period */)
   -> hardware_interface::return_type
 {
   for (std::size_t i = 0; i < info_.joints.size(); ++i) {
@@ -333,7 +317,7 @@ auto BravoHardware::write(const rclcpp::Time & /* time */, const rclcpp::Duratio
   return hardware_interface::return_type::OK;
 }
 
-}  // namespace bravo::hardware
+}  // namespace reach::hardware
 
 #include "pluginlib/class_list_macros.hpp"
-PLUGINLIB_EXPORT_CLASS(bravo::hardware::BravoHardware, hardware_interface::SystemInterface)
+PLUGINLIB_EXPORT_CLASS(bravo::hardware::Bravo7Hardware, hardware_interface::SystemInterface)

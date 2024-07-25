@@ -44,10 +44,10 @@
 #include "rclcpp/rclcpp.hpp"
 #include "rclcpp_lifecycle/state.hpp"
 
-namespace bravo::hardware
+namespace reach::hardware
 {
 
-class BravoHardware : public hardware_interface::SystemInterface
+class Bravo7Hardware : public hardware_interface::SystemInterface
 {
 public:
   RCLCPP_SHARED_PTR_DEFINITIONS(BravoHardware)  // NOLINT
@@ -97,7 +97,7 @@ private:
   // Device operating modes
   std::vector<libreach::Mode> control_modes_;
 
-  rclcpp::Logger logger_{rclcpp::get_logger("bravo_hardware")};
+  rclcpp::Logger logger_{rclcpp::get_logger("bravo_7_hardware")};
 };
 
-}  // namespace bravo::hardware
+}  // namespace reach::hardware
