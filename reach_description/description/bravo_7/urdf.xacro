@@ -1,0 +1,647 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://ros.org/wiki/xacro">
+
+  <xacro:property name="joint_damping"
+                  value="0.00143" />
+  <xacro:property name="prismatic_joint_damping"
+                  value="0.00089" />
+  <xacro:property name="joint_friction"
+                  value="0.079" />
+  <xacro:property name="ft_sensor_angle"
+                  value="1.8259381" />
+
+  <xacro:macro name="bravo_urdf"
+               params="parent prefix *origin use_ft_sensor:=true">
+
+    <material name="${prefix}black">
+      <color rgba="0.3 0.3 0.3 1" />
+    </material>
+
+    <!-- Links -->
+    <link name="${prefix}base_link">
+      <visual>
+        <origin xyz="0.0 0.0 0.0"
+                rpy="0.0 0.0 0.0" />
+        <material name="${prefix}black" />
+        <geometry>
+          <mesh filename="$(find reach_description)/meshes/bravo_7/1019-A.stl" />
+        </geometry>
+      </visual>
+      <inertial>
+        <origin xyz="0.052500000000000005 -0.0010000053071760658 0.033650002653596835"
+                rpy="0.0 -0.0 0.0" />
+        <mass value="1.85" />
+        <inertia ixx="0.0001767933750000004"
+                 ixy="-0.010800269063967364"
+                 ixz="-0.010757269071928286"
+                 iyy="-0.008187269162146547"
+                 iyz="-0.01078726772655808"
+                 izz="-0.005309062462853453" />
+      </inertial>
+      <collision>
+        <geometry>
+          <box size="0.0625 0.1112 0.088 " />
+        </geometry>
+        <origin xyz="0.03625 0.0 0.044"
+                rpy="0.0 -0.0 0.0" />
+      </collision>
+      <collision>
+        <geometry>
+          <box size="0.05 0.08 0.06" />
+        </geometry>
+        <origin xyz="0.025 -0.04556 0.03"
+                rpy="0.0 -0.0 0.0" />
+      </collision>
+      <collision>
+        <geometry>
+          <cylinder radius="0.046"
+                    length="0.0851" />
+        </geometry>
+        <origin xyz="0.0675 0.0 0.04255"
+                rpy="0.0 -0.0 0.0" />
+      </collision>
+    </link>
+
+    <link name="${prefix}1019_end_link">
+      <visual>
+        <geometry>
+          <mesh filename="$(find reach_description)/meshes/bravo_7/1013-A.stl" />
+        </geometry>
+        <material name="${prefix}black" />
+        <origin xyz="0.0 0.0 0.0058"
+                rpy="0.0 -0.0 3.14159" />
+      </visual>
+      <visual>
+        <geometry>
+          <mesh filename="$(find reach_description)/meshes/bravo_7/1019-B.stl" />
+        </geometry>
+        <material name="${prefix}black" />
+        <origin xyz="0.0 0.0 0.0"
+                rpy="0.0 0.0 3.14159" />
+      </visual>
+      <inertial>
+        <origin xyz="0.029000053072066954 -0.010000103489825904 0.05364997346396829"
+                rpy="0.0 -0.0 0.0" />
+        <mass value="1.62" />
+        <inertia ixx="-7.4169231311085534e-06"
+                 ixy="-0.0029550371991257053"
+                 ixz="-0.004212035657385413"
+                 iyy="0.0010209661974629213"
+                 iyz="-0.002844035049716061"
+                 izz="0.002385381825668186" />
+      </inertial>
+      <collision>
+        <geometry>
+          <cylinder radius="0.046"
+                    length="0.0667" />
+        </geometry>
+        <origin xyz="0.0 0.0 0.03915"
+                rpy="0.0 -0.0 0.0" />
+      </collision>
+      <collision>
+        <geometry>
+          <cylinder radius="0.046"
+                    length="0.0738" />
+        </geometry>
+        <origin xyz="0.046 0.0149 0.0725"
+                rpy="1.5707 -0.0 0.0" />
+      </collision>
+    </link>
+
+    <link name="${prefix}1013_joint_link">
+      <visual>
+        <geometry>
+          <mesh filename="$(find reach_description)/meshes/bravo_7/1013-B.stl" />
+        </geometry>
+        <material name="${prefix}black" />
+        <origin xyz="0.0 0.0 0.0"
+                rpy="0.0 0.0 3.14159" />
+      </visual>
+      <visual>
+        <geometry>
+          <mesh filename="$(find reach_description)/meshes/bravo_7/RS2-1026-A.stl" />
+        </geometry>
+        <material name="${prefix}black" />
+        <origin xyz="0.04600000000128156 4.829533423884964e-07 -0.23533999999935923"
+                rpy="3.14159 -0.0 3.14159" />
+      </visual>
+      <visual>
+        <geometry>
+          <mesh filename="$(find reach_description)/meshes/bravo_7/1030.stl" />
+        </geometry>
+        <material name="${prefix}black" />
+        <origin xyz="0.046 0.0 -0.05334"
+                rpy="3.14159 -0.0 3.14159" />
+      </visual>
+      <inertial>
+        <origin xyz="0.02614393591762409 -0.004000726999431309 -0.17620840523390582"
+                rpy="0.0 -0.0 0.0" />
+        <mass value="2.12" />
+        <inertia ixx="0.03522180708867557"
+                 ixy="-2.5616015376588342e-05"
+                 ixz="-0.0013021484721849014"
+                 iyy="0.03597802003044357"
+                 iyz="-0.0031539607831752277"
+                 izz="0.003361250024861972" />
+      </inertial>
+      <collision>
+        <geometry>
+          <cylinder radius="0.046"
+                    length="0.0228" />
+        </geometry>
+        <origin xyz="0.0 -0.0334 0.0"
+                rpy="1.5707 0.0 0.0" />
+      </collision>
+      <collision>
+        <geometry>
+          <cylinder radius="0.046"
+                    length="0.05094" />
+        </geometry>
+        <origin xyz="0.046 0.0 -0.02547"
+                rpy="0.0 0.0 0.0" />
+      </collision>
+      <collision>
+        <geometry>
+          <cylinder radius="0.0408"
+                    length="0.059" />
+        </geometry>
+        <origin xyz="0.04600000000148929 5.612342412921263e-07 -0.26483999999925534"
+                rpy="3.14159 -0.0 3.14159" />
+      </collision>
+      <collision>
+        <geometry>
+          <cylinder radius="0.0408"
+                    length="0.0599" />
+        </geometry>
+        <origin xyz="0.005199961922827123 -0.014349252218295189 -0.294340038078165"
+                rpy="-1.5708953071795866 -0.0 3.14159" />
+      </collision>
+      <collision>
+        <geometry>
+          <cylinder radius="0.046"
+                    length="0.03033333" />
+        </geometry>
+        <origin xyz="0.046000000000106796 4.0246094175109416e-08 -0.0685066599999466"
+                rpy="3.14159 -0.0 3.14159" />
+      </collision>
+      <collision>
+        <geometry>
+          <cylinder radius="0.045"
+                    length="0.03033333" />
+        </geometry>
+        <origin xyz="0.04600000000032039 1.207383355971241e-07 -0.0988399999998398"
+                rpy="3.14159 -0.0 3.14159" />
+      </collision>
+      <collision>
+        <geometry>
+          <cylinder radius="0.044"
+                    length="0.03033333" />
+        </geometry>
+        <origin xyz="0.04600000000053398 2.0123055844401027e-07 -0.129173332999733"
+                rpy="3.14159 -0.0 3.14159" />
+      </collision>
+      <collision>
+        <geometry>
+          <cylinder radius="0.043"
+                    length="0.03033333" />
+        </geometry>
+        <origin xyz="0.046000000000747575 2.817227828830503e-07 -0.1595066665996262"
+                rpy="3.14159 -0.0 3.14159" />
+      </collision>
+      <collision>
+        <geometry>
+          <cylinder radius="0.042"
+                    length="0.03033333" />
+        </geometry>
+        <origin xyz="0.04600000000096117 3.6221500679137236e-07 -0.18983999999951942"
+                rpy="3.14159 -0.0 3.14159" />
+      </collision>
+      <collision>
+        <geometry>
+          <cylinder radius="0.041"
+                    length="0.03033333" />
+        </geometry>
+        <origin xyz="0.04600000000117476 4.427071420697953e-07 -0.22017329999941262"
+                rpy="3.14159 -0.0 3.14159" />
+      </collision>
+    </link>
+
+    <link name="${prefix}1026_0_joint_link">
+      <visual>
+        <geometry>
+          <mesh filename="$(find reach_description)/meshes/bravo_7/RS2-1026-B.stl" />
+        </geometry>
+        <material name="${prefix}black" />
+        <origin xyz="0.0 0.0 0.0"
+                rpy="0.0 -0.0 0.0" />
+      </visual>
+      <inertial>
+        <origin xyz="0.031063964725062076 0.002998228717415121 -0.04499613595612657"
+                rpy="0.0 -0.0 0.0" />
+        <mass value="1.33" />
+        <inertia ixx="0.0018075916378076167"
+                 ixy="0.00014318762193144414"
+                 ixz="0.0003851922094691543"
+                 iyy="0.0020111672541860653"
+                 iyz="-0.0002098175940630606"
+                 izz="0.001545577033243905" />
+      </inertial>
+      <collision>
+        <geometry>
+          <cylinder radius="0.0408"
+                    length="0.02335" />
+        </geometry>
+        <origin xyz="0.0 0.027275 0.0"
+                rpy="1.5707 0.0 0.0" />
+      </collision>
+      <collision>
+        <geometry>
+          <cylinder radius="0.0408"
+                    length="0.0851" />
+        </geometry>
+        <origin xyz="0.0408 0.0 -0.0473"
+                rpy="0.0 0.0 0.0" />
+      </collision>
+    </link>
+
+    <link name="${prefix}1026_1_joint_link">
+      <visual>
+        <geometry>
+          <mesh filename="$(find reach_description)/meshes/bravo_7/RS2-1026-C.stl" />
+        </geometry>
+        <material name="${prefix}black" />
+        <origin xyz="0.0 0.0 0.0"
+                rpy="0.0 0.0 0.0" />
+      </visual>
+      <visual>
+        <geometry>
+          <mesh filename="$(find reach_description)/meshes/bravo_7/RS2-1023-A.stl" />
+        </geometry>
+        <material name="${prefix}black" />
+        <origin xyz="0.0 0.0 0.0054"
+                rpy="0.0 -0.0 3.14159" />
+      </visual>
+      <inertial>
+        <origin xyz="-0.030926349610074382 0.012001163718658751 0.056948306126308565"
+                rpy="0.0 -0.0 0.0" />
+        <mass value="1.33" />
+        <inertia ixx="-0.00832916419325029"
+                 ixy="-0.010143824151758763"
+                 ixz="-0.009682830984713842"
+                 iyy="-0.007647783076280421"
+                 iyz="-0.0105877952718513"
+                 izz="0.001514369533161315" />
+      </inertial>
+      <collision>
+        <geometry>
+          <cylinder radius="0.0408"
+                    length="0.003" />
+        </geometry>
+        <origin xyz="0.0 0.0 0.0"
+                rpy="0.0 0.0 3.14159" />
+      </collision>
+      <collision>
+        <geometry>
+          <cylinder radius="0.0408"
+                    length="0.059" />
+        </geometry>
+        <origin xyz="0.0 0.0 0.0349"
+                rpy="0.0 -0.0 3.14159" />
+      </collision>
+      <collision>
+        <geometry>
+          <cylinder radius="0.0408"
+                    length="0.0599" />
+        </geometry>
+        <origin xyz="-0.04079996192084282 0.014350108266413046 0.0644"
+                rpy="1.5707 -0.0 3.14159" />
+      </collision>
+    </link>
+
+    <link name="${prefix}1023_0_joint_link">
+      <visual>
+        <geometry>
+          <mesh filename="$(find reach_description)/meshes/bravo_7/RS2-1023-B.stl" />
+        </geometry>
+        <material name="${prefix}black" />
+        <origin xyz="0.0 0.0 0.0"
+                rpy="0.0 -0.0 0.0" />
+      </visual>
+      <inertial>
+        <origin xyz="0.03882206784524773 -0.006000269377738013 -0.041913219531621276"
+                rpy="0.0 -0.0 0.0" />
+        <mass value="0.97" />
+        <inertia ixx="0.0012635074957551597"
+                 ixy="4.859518648201744e-05"
+                 ixz="0.00027856597958993856"
+                 iyy="0.0014435491024125883"
+                 iyz="-0.00025641638880114734"
+                 izz="0.0011460308711732192" />
+      </inertial>
+      <collision>
+        <geometry>
+          <cylinder radius="0.0408"
+                    length="0.02335" />
+        </geometry>
+        <origin xyz="0.0 0.027275 0.0"
+                rpy="1.5707 0.0 0.0" />
+      </collision>
+      <collision>
+        <geometry>
+          <cylinder radius="0.0408"
+                    length="0.0851" />
+        </geometry>
+        <origin xyz="0.0408 0.0 -0.0473"
+                rpy="0.0 0.0 0.0" />
+      </collision>
+    </link>
+
+    <xacro:if value="${use_ft_sensor}">
+      <link name="${prefix}ft_sensor_link">
+        <visual>
+          <geometry>
+            <cylinder length="0.042"
+                      radius="${0.083 / 2}" />
+          </geometry>
+          <material name="${prefix}black" />
+          <origin xyz="0.0 0.0 0.021"
+                  rpy="0.0 0.0 0.0" />
+        </visual>
+        <collision>
+          <geometry>
+            <cylinder length="0.042"
+                      radius="${0.083 / 2}" />
+          </geometry>
+          <material name="${prefix}black" />
+          <origin xyz="0.0 0.0 0.021"
+                  rpy="0.0 0.0 0.0" />
+        </collision>
+      </link>
+
+      <link name="${prefix}1023_1_joint_link">
+        <visual>
+          <geometry>
+            <mesh filename="$(find reach_description)/meshes/bravo_7/RS2-1023-C.stl" />
+          </geometry>
+          <material name="${prefix}black" />
+          <origin xyz="0.0 0.0 0.0"
+                  rpy="0.0 -0.0 0.0" />
+        </visual>
+        <visual>
+          <geometry>
+            <mesh filename="$(find reach_description)/meshes/bravo_7/1038.stl" />
+          </geometry>
+          <material name="${prefix}black" />
+          <origin xyz="0.0 0.0 0.0054"
+                  rpy="0.0 -0.0 0.0" />
+        </visual>
+        <inertial>
+          <origin xyz="-0.007856122583731653 1.191782894075085e-06 0.06886021849973584"
+                  rpy="0.0 -0.0 0.0" />
+          <mass value="1.35" />
+          <inertia ixx="-0.0070153399422235915"
+                   ixy="-0.009640678120463793"
+                   ixz="-0.009618302820342164"
+                   iyy="-0.006090679776636699"
+                   iyz="-0.00963571107587032"
+                   izz="0.0011986599361994638" />
+        </inertial>
+        <collision>
+          <geometry>
+            <cylinder radius="0.0408"
+                      length="0.003" />
+          </geometry>
+          <origin xyz="0.0 0.0 0.0"
+                  rpy="0.0 0.0 0.0" />
+        </collision>
+        <collision>
+          <geometry>
+            <cylinder radius="0.0408"
+                      length="0.12535" />
+          </geometry>
+          <origin xyz="0.0 0.0 0.0654"
+                  rpy="0.0 -0.0 0.0" />
+        </collision>
+      </link>
+
+      <insert_block name="end_effector" />
+    </xacro:if>
+
+
+    <xacro:unless value="${use_ft_sensor}">
+      <link name="${prefix}1023_1_joint_link">
+        <inertial>
+          <origin xyz="-0.007848348345388155 8.383467019698216e-07 0.04286021966442238"
+                  rpy="0.0 -0.0 0.0" />
+          <mass value="1.09" />
+          <inertia ixx="-0.005739665883907044"
+                   ixy="-0.007783149016640456"
+                   ixz="-0.007767867282695909"
+                   iyy="-0.005797148921426273"
+                   iyz="-0.007782161916684913"
+                   izz="0.0009685169067404991" />
+        </inertial>
+        <visual>
+          <geometry>
+            <mesh filename="$(find reach_description)/meshes/bravo_7/RS2-1023-C.stl" />
+          </geometry>
+          <material name="${prefix}black" />
+          <origin xyz="0.0 0.0 0.0"
+                  rpy="0.0 -0.0 0.0" />
+        </visual>
+        <visual>
+          <geometry>
+            <mesh filename="$(find reach_description)/meshes/bravo_7/1038.stl" />
+          </geometry>
+          <material name="${prefix}black" />
+          <origin xyz="0.0 0.0 0.0054"
+                  rpy="0.0 -0.0 0.0" />
+        </visual>
+        <collision>
+          <geometry>
+            <cylinder radius="0.0408"
+                      length="0.003" />
+          </geometry>
+          <origin xyz="0.0 0.0 0.0"
+                  rpy="0.0 0.0 0.0" />
+        </collision>
+        <collision>
+          <geometry>
+            <cylinder radius="0.0408"
+                      length="0.12535" />
+          </geometry>
+          <origin xyz="0.0 0.0 0.0654"
+                  rpy="0.0 -0.0 0.0" />
+        </collision>
+      </link>
+    </xacro:unless>
+
+    <link name="${prefix}push_rod">
+      <inertial>
+        <origin xyz="0.008269061206615146 2.1481704501120766e-06 -0.00012210240446196524"
+                rpy="0.0 -0.0 0.0" />
+        <mass value="0.64" />
+        <inertia ixx="0.0003082092929784328"
+                 ixy="-5.6822416478701867e-05"
+                 ixz="-7.455807417347965e-05"
+                 iyy="0.0022022041006320905"
+                 iyz="-5.579658104299784e-05"
+                 izz="0.0021819948567845843" />
+      </inertial>
+    </link>
+
+    <xacro:include filename="$(find reach_description)/description/bravo_7/end_effectors/standard_jaws.urdf.xacro" />
+
+    <xacro:standard_jaws_urdf parent="${prefix}ee_base_link"
+                              prefix="${prefix}standard_jaws_"
+                              axis_a="${prefix}axis_a">
+      <origin xyz="0 0 0"
+              rpy="0 0 0" />
+    </xacro:standard_jaws_urdf>
+
+    <!-- Joints -->
+    <joint name="${prefix}base_joint"
+           type="fixed">
+      <parent link="${parent}" />
+      <child link="${prefix}base_link" />
+      <dynamics damping="${joint_damping}"
+                friction="${joint_friction}" />
+      <xacro:insert_block name="origin" />
+    </joint>
+
+    <joint name="${prefix}axis_g"
+           type="revolute">
+      <parent link="${prefix}base_link" />
+      <child link="${prefix}1019_end_link" />
+      <axis xyz=" 0 0 -1" />
+      <origin xyz="0.0665 0.0 0.08"
+              rpy="0.0 -0.0 3.14159" />
+      <dynamics damping="${joint_damping}"
+                friction="${joint_friction}" />
+      <limit effort="500.0"
+             velocity="6.0"
+             lower="0.0"
+             upper="6.2" />
+    </joint>
+
+    <joint name="${prefix}axis_f"
+           type="revolute">
+      <parent link="${prefix}1019_end_link" />
+      <child link="${prefix}1013_joint_link" />
+      <axis xyz=" 0 -1 0" />
+      <origin xyz="0.046 0.0 0.0725"
+              rpy="0.0 -0.0 0.0" />
+      <dynamics damping="${joint_damping}"
+                friction="${joint_friction}" />
+      <limit effort="500.0"
+             velocity="6.0"
+             lower="0.0"
+             upper="3.14" />
+    </joint>
+
+    <joint name="${prefix}axis_e"
+           type="revolute">
+      <parent link="${prefix}1013_joint_link" />
+      <child link="${prefix}1026_0_joint_link" />
+      <axis xyz=" 0 -1 0" />
+      <origin xyz="0.005200000001840656 7.477816037645476e-07 -0.2943399999991515"
+              rpy="3.14159 -0.0 3.14159" />
+      <dynamics damping="${joint_damping}"
+                friction="${joint_friction}" />
+      <limit effort="500.0"
+             velocity="6.0"
+             lower="0.0"
+             upper="3.14" />
+    </joint>
+
+    <joint name="${prefix}axis_d"
+           type="revolute">
+      <parent link="${prefix}1026_0_joint_link" />
+      <child link="${prefix}1026_1_joint_link" />
+      <axis xyz=" 0 0 -1" />
+      <origin xyz="0.0408 0.0 -0.08705"
+              rpy="3.14159 -0.0 0.0" />
+      <dynamics damping="${joint_damping}"
+                friction="${joint_friction}" />
+      <limit effort="500.0"
+             velocity="6.0"
+             lower="0.0"
+             upper="6.2" />
+    </joint>
+
+    <joint name="${prefix}axis_c"
+           type="revolute">
+      <parent link="${prefix}1026_1_joint_link" />
+      <child link="${prefix}1023_0_joint_link" />
+      <axis xyz=" 0 -1 0" />
+      <origin xyz="-0.040799999999856354 1.082664635687914e-07 0.0644"
+              rpy="0.0 -0.0 3.14159" />
+      <dynamics damping="${joint_damping}"
+                friction="${joint_friction}" />
+      <limit effort="500.0"
+             velocity="6.0"
+             lower="0.0"
+             upper="3.14" />
+    </joint>
+
+    <xacro:if value="${use_ft_sensor}">
+      <joint name="${prefix}axis_b"
+             type="revolute">
+        <parent link="${prefix}1023_0_joint_link" />
+        <child link="${prefix}ft_sensor_link" />
+        <axis xyz=" 0 0 -1" />
+        <origin xyz="0.0408 0.0 -0.08705"
+                rpy="-3.14159 -7.041538791385784e-12 ${ft_sensor_angle-3.14159}" />
+        <dynamics damping="${joint_damping}"
+                  friction="${joint_friction}" />
+        <limit effort="500.0"
+               velocity="6.0"
+               lower="0"
+               upper="6.28" />
+      </joint>
+
+      <joint name="bravo_ft_fixed_joint"
+             type="fixed">
+        <parent link="${prefix}ft_sensor_link" />
+        <child link="${prefix}1023_1_joint_link" />
+        <axis xyz=" 0 0 -1" />
+        <origin xyz="0 0 0.042"
+                rpy="0 0 ${-ft_sensor_angle}" />
+      </joint>
+    </xacro:if>
+
+    <xacro:unless value="${use_ft_sensor}">
+      <joint name="${prefix}axis_b"
+             type="revolute">
+        <parent link="${prefix}1023_0_joint_link" />
+        <child link="${prefix}1023_1_joint_link" />
+        <axis xyz=" 0 0 -1" />
+        <origin xyz="0.0408 0.0 -0.08705"
+                rpy="-3.14159 -7.041538791385784e-12 -3.14159" />
+        <dynamics damping="${joint_damping}"
+                  friction="${joint_friction}" />
+        <limit effort="500.0"
+               velocity="6.0"
+               lower="0"
+               upper="6.28" />
+      </joint>
+    </xacro:unless>
+
+    <joint name="${prefix}axis_a"
+           type="prismatic">
+      <parent link="${prefix}1023_1_joint_link" />
+      <child link="${prefix}push_rod" />
+      <axis xyz="0 0 1" />
+      <origin xyz="-0.008999999958245167 0.0 0.1307508669411527"
+              rpy="0.0 -1.5706999999997038 0.0" />
+      <dynamics damping="${prismatic_joint_damping}"
+                friction="${joint_friction}" />
+      <limit effort="1000.0"
+             velocity="10.0"
+             lower="0.0"
+             upper="0.035" />
+    </joint>
+
+  </xacro:macro>
+
+</robot>

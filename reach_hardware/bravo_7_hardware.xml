@@ -1,0 +1,10 @@
+<library path="bravo_hardware">
+  <class name="bravo_hardware/BravoHardware"
+    type="bravo::hardware::BravoHardware"
+    base_class_type="hardware_interface::SystemInterface">
+    <description>
+      Reach Bravo 7 manipulator plugin for ros2_control using a system hardware
+      interface-type.
+    </description>
+  </class>
+</library>

@@ -38,8 +38,7 @@
         "esbenp.prettier-vscode",
         "xaver.clang-format",
         "charliermarsh.ruff",
-        "ms-python.black-formatter",
-        "jeff-hykin.better-cpp-syntax"
+        "ms-vscode.cmake-tools"
       ]
     }
   }

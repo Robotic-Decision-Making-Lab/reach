@@ -1,0 +1,58 @@
+launch:
+  - arg:
+      name: "prefix"
+      default: ""
+
+  - arg:
+      name: "ip_address"
+      default: "192.168.2.3"
+
+  - arg:
+      name: "port"
+      default: "6789"
+
+  - arg:
+      name: "use_rviz"
+      default: "true"
+
+  - arg:
+      name: "rviz_config"
+      default: $(find-pkg-share reach_description)/rviz/bravo_7/view_bravo.rviz
+
+  - let:
+      name: description_file
+      value: $(find-pkg-share reach_description)/description/bravo_7/config.xacro
+
+  - arg:
+      name: robot_description
+      default: $(command 'xacro $(var description_file) ip_address:=$(var ip_address) port:=$(var port)')
+
+  - node:
+      pkg: robot_state_publisher
+      exec: robot_state_publisher
+      param:
+        - name: robot_description
+          value: $(var robot_description)
+
+  - node:
+      pkg: controller_manager
+      exec: ros2_control_node
+      param:
+        - from: $(find-pkg-share reach_description)/config/bravo_7/controllers.yaml
+      remap:
+        - from: /controller_manager/robot_description
+          to: /robot_description
+
+  - node:
+      pkg: controller_manager
+      exec: spawner
+      args: joint_state_broadcaster --controller-manager controller_manager
+
+  - node:
+      pkg: rviz2
+      exec: rviz2
+      if: $(var use_rviz)
+      args: -d $(var rviz_config)
+      param:
+        - name: robot_description
+          value: $(var robot_description)

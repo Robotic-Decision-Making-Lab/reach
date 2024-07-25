@@ -1,0 +1,44 @@
+<?xml version="1.0"?>
+<robot name="bravo"
+       xmlns:xacro="http://ros.org/wiki/xacro">
+
+  <!-- Arguments -->
+  <xacro:arg name="prefix"
+             default="" />
+  <xacro:arg name="use_fake_hardware"
+             default="true" />
+  <xacro:arg name="ip_address"
+             default="192.168.2.3" />
+  <xacro:arg name="port"
+             default="6789" />
+  <xacro:arg name="state_request_rate"
+             default="2" />
+  <xacro:arg name="use_ft_sensor"
+             default="true" />
+  <xacro:arg name="initial_positions_file"
+             default="initial_positions.yaml" />
+
+  <!-- Properties -->
+  <xacro:property name="prefix"
+                  value="$(arg prefix)" />
+
+  <!-- Imports -->
+  <xacro:include filename="$(find reach_description)/description/bravo_7/urdf.xacro" />
+  <xacro:include filename="$(find reach_description)/description/bravo_7/ros2_control.xacro" />
+
+  <link name="base_footprint" />
+
+  <xacro:bravo_urdf parent="base_footprint"
+                    prefix="${prefix}">
+    <origin xyz="0 0 0"
+            rpy="0 0 0" />
+  </xacro:bravo_urdf>
+
+  <xacro:bravo_system prefix="${prefix}"
+                      ip_address="$(arg ip_address)"
+                      port="$(arg port)"
+                      state_request_rate="$(arg state_request_rate)"
+                      initial_positions_file="$(arg initial_positions_file)"
+                      use_fake_hardware="$(arg use_fake_hardware)" />
+
+</robot>
