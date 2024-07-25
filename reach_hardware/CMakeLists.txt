@@ -33,7 +33,6 @@ target_compile_features(reach_hardware PUBLIC cxx_std_17)
 ament_target_dependencies(reach_hardware ${THIS_PACKAGE_INCLUDE_DEPENDS})
 
 pluginlib_export_plugin_description_file(hardware_interface bravo_7_hardware.xml)
-pluginlib_export_plugin_description_file(hardware_interface alpha_5_hardware.xml)
 
 if(BUILD_TESTING)
     find_package(ament_lint_auto REQUIRED)

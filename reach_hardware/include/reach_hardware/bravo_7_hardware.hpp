@@ -50,7 +50,7 @@ namespace reach::hardware
 class Bravo7Hardware : public hardware_interface::SystemInterface
 {
 public:
-  RCLCPP_SHARED_PTR_DEFINITIONS(BravoHardware)  // NOLINT
+  RCLCPP_SHARED_PTR_DEFINITIONS(Bravo7Hardware)  // NOLINT
 
   auto on_init(const hardware_interface::HardwareInfo & info) -> hardware_interface::CallbackReturn override;
 

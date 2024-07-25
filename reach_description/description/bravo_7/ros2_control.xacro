@@ -20,7 +20,7 @@
           <plugin>mock_components/GenericSystem</plugin>
         </xacro:if>
         <xacro:unless value="${use_fake_hardware}">
-          <plugin>bravo_hardware/BravoHardware</plugin>
+          <plugin>reach_hardware/Bravo7Hardware</plugin>
           <param name="ip_address">${ip_address}</param>
           <param name="port">${port}</param>
           <param name="state_request_rate">${state_request_rate}</param>

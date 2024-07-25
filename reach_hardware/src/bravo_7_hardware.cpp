@@ -320,4 +320,4 @@ auto Bravo7Hardware::write(const rclcpp::Time & /* time */, const rclcpp::Durati
 }  // namespace reach::hardware
 
 #include "pluginlib/class_list_macros.hpp"
-PLUGINLIB_EXPORT_CLASS(bravo::hardware::Bravo7Hardware, hardware_interface::SystemInterface)
+PLUGINLIB_EXPORT_CLASS(reach::hardware::Bravo7Hardware, hardware_interface::SystemInterface)

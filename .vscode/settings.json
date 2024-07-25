@@ -37,6 +37,9 @@
   "C_Cpp.codeAnalysis.clangTidy.enabled": true,
   "C_Cpp.codeAnalysis.clangTidy.codeAction.formatFixes": true,
   "clang-format.executable": "/usr/bin/clang-format-18",
+  "xml.format.maxLineWidth": 120,
+  "xml.format.splitAttributes": "alignWithFirstAttr",
+  "editor.detectIndentation": false,
   "[cpp]": {
     "editor.rulers": [120],
     "editor.tabSize": 2,
