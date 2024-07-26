@@ -6,7 +6,7 @@
   <version>0.0.1</version>
   <description>Configuration files for the Reach Bravo</description>
 
-  <maintainer email="evanp922@gmail.com">ubuntu</maintainer>
+  <maintainer email="evanp922@gmail.com">Evan Palmer</maintainer>
   <license>MIT</license>
 
   <url type="repository">https://github.com/Robotic-Decision-Making-Lab/bravo.git</url>

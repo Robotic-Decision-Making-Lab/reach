@@ -2,9 +2,9 @@
 <?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
 <package format="3">
 
-  <name>reach_hardware</name>
-  <version>0.1.0</version>
-  <description>ros2_control system hardware interface for the Reach Bravo 7</description>
+  <name>reach_msgs</name>
+  <version>0.0.1</version>
+  <description>ROS 2 messages used by the project</description>
 
   <maintainer email="evanp922@gmail.com">Evan Palmer</maintainer>
   <license>MIT</license>
@@ -13,18 +13,17 @@
   <url type="bugtracker">https://github.com/Robotic-Decision-Making-Lab/bravo/issues</url>
 
   <buildtool_depend>ament_cmake</buildtool_depend>
+  <buildtool_depend>rosidl_default_generators</buildtool_depend>
 
-  <depend>rclcpp</depend>
-  <depend>ros2_control</depend>
-  <depend>hardware_interface</depend>
-  <depend>pluginlib</depend>
-  <depend>libreach</depend>
+  <depend>builtin_interfaces</depend>
+  <depend>std_msgs</depend>
+
+  <exec_depend>rosidl_default_runtime</exec_depend>
 
   <test_depend>ament_lint_auto</test_depend>
   <test_depend>ament_lint_common</test_depend>
 
-  <exec_depend>controller_manager</exec_depend>
-
+  <member_of_group>rosidl_interface_packages</member_of_group>
   <export>
     <build_type>ament_cmake</build_type>
   </export>

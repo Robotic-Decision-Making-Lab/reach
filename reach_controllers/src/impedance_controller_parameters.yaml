@@ -1,0 +1,19 @@
+impedance_controller:
+  stiffness: {
+    type: double_array,
+    default_value: [],
+    read_only: false,
+    Description: "Stiffness of the impedance controller at the joint level",
+    validation: {
+      not_empty<>: null
+    }
+  }
+  damping: {
+    type: double_array,
+    default_value: [],
+    read_only: false,
+    Description: "Damping of the impedance controller at the joint level",
+    validation: {
+      not_empty<>: null
+    }
+  }

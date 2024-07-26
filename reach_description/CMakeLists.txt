@@ -3,6 +3,9 @@ project(reach_description)
 
 find_package(ament_cmake REQUIRED)
 
-install(DIRECTORY description meshes rviz config DESTINATION share/reach_description)
+install(
+    DIRECTORY description meshes rviz config
+    DESTINATION share/reach_description
+)
 
 ament_package()

@@ -5,5 +5,7 @@
 !reach_bringup
 !reach_description
 !reach_hardware
+!reach_controllers
+!reach_msgs
 
 !ros2.repos
