@@ -11,7 +11,7 @@
     <link name="${prefix}base_link">
       <visual>
         <geometry>
-          <mesh filename="$(find reach_description)/meshes/bravo_7/end_effectors/RS2-257.stl" />
+          <mesh filename="file://$(find reach_description)/meshes/bravo_7/end_effectors/RS2-257.stl" />
         </geometry>
         <material name="${prefix}black" />
         <origin xyz="0.0 0.0 0.13074999999999998"
@@ -29,23 +29,23 @@
       <collision>
         <geometry>
           <cylinder length="0.02"
-                    radius="0.05" />
+                    radius="0.04" />
         </geometry>
-        <origin xyz="0.01 0 0.00"
-                rpy="0 1.5707 0" />
+        <origin xyz="0.0 0.0 0.13074999999999998"
+                rpy="0.0 0.0 0.0" />
       </collision>
     </link>
 
     <link name="${prefix}rs2_300_link">
       <visual>
         <geometry>
-          <mesh filename="$(find reach_description)/meshes/bravo_7/end_effectors/RS2-300.stl" />
+          <mesh filename="file://$(find reach_description)/meshes/bravo_7/end_effectors/RS2-300.stl" />
         </geometry>
         <material name="${prefix}black" />
       </visual>
       <inertial>
         <mass value="0.24" />
-        <origin xyz="0.05 0.0 0" />
+        <origin xyz="0.05 0.0 0.0" />
         <inertia ixx="${244 * 1e-6}"
                  ixy="${-12 * 1e-6}"
                  ixz="${0 * 1e-6}"
@@ -55,7 +55,7 @@
       </inertial>
       <collision>
         <geometry>
-          <mesh filename="$(find reach_description)/meshes/bravo_7/end_effectors/RS2-300.stl" />
+          <mesh filename="file://$(find reach_description)/meshes/bravo_7/end_effectors/RS2-300.stl" />
         </geometry>
       </collision>
     </link>
@@ -63,13 +63,13 @@
     <link name="${prefix}rs2_301_link">
       <visual>
         <geometry>
-          <mesh filename="$(find reach_description)/meshes/bravo_7/end_effectors/RS2-301.stl" />
+          <mesh filename="file://$(find reach_description)/meshes/bravo_7/end_effectors/RS2-301.stl" />
         </geometry>
         <material name="${prefix}black" />
       </visual>
       <inertial>
         <mass value="0.24" />
-        <origin xyz="0.05 0.0 0" />
+        <origin xyz="0.05 0.0 0.0" />
         <inertia ixx="${244 * 1e-6}"
                  ixy="${-12 * 1e-6}"
                  ixz="${0 * 1e-6}"
@@ -79,7 +79,7 @@
       </inertial>
       <collision>
         <geometry>
-          <mesh filename="$(find reach_description)/meshes/bravo_7/end_effectors/RS2-301.stl" />
+          <mesh filename="file://$(find reach_description)/meshes/bravo_7/end_effectors/RS2-301.stl" />
         </geometry>
       </collision>
     </link>
@@ -89,18 +89,18 @@
       <xacro:insert_block name="origin" />
       <parent link="${parent}" />
       <child link="${prefix}base_link" />
-      <origin xyz="0 0 0"
-              rpy="0 0 0" />
+      <origin xyz="0.0 0.0 0.0"
+              rpy="0.0 0.0 0.0" />
     </joint>
 
     <joint name="${prefix}rs2_300_joint"
            type="revolute">
-      <origin xyz="0.0097 -0.033 0"
-              rpy="0 0 0" />
+      <origin xyz="2.3214757534187783e-06 0.0268 0.15484999988818982"
+              rpy="0.0 -1.5706999999997038 0.0" />
       <parent link="${prefix}base_link" />
       <child link="${prefix}rs2_300_link" />
       <axis xyz="0 0 -1" />
-      <limit lower="0"
+      <limit lower="0.0"
              upper="1.0"
              effort="400"
              velocity="10.0" />
@@ -111,8 +111,8 @@
 
     <joint name="${prefix}rs2_301_joint"
            type="revolute">
-      <origin xyz="0.0097 0.033 0"
-              rpy="0 0 0" />
+      <origin xyz="2.3214757534187783e-06 -0.0268 0.15484999988818982"
+              rpy="0.0 -1.5706999999997038 0.0" />
       <parent link="${prefix}base_link" />
       <child link="${prefix}rs2_301_link" />
       <axis xyz="0 0 1" />

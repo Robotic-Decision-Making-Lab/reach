@@ -24,7 +24,7 @@
                 rpy="0.0 0.0 0.0" />
         <material name="${prefix}black" />
         <geometry>
-          <mesh filename="$(find reach_description)/meshes/bravo_7/1019-A.stl" />
+          <mesh filename="file://$(find reach_description)/meshes/bravo_7/1019-A.stl" />
         </geometry>
       </visual>
       <inertial>
@@ -65,7 +65,7 @@
     <link name="${prefix}1019_end_link">
       <visual>
         <geometry>
-          <mesh filename="$(find reach_description)/meshes/bravo_7/1013-A.stl" />
+          <mesh filename="file://$(find reach_description)/meshes/bravo_7/1013-A.stl" />
         </geometry>
         <material name="${prefix}black" />
         <origin xyz="0.0 0.0 0.0058"
@@ -73,7 +73,7 @@
       </visual>
       <visual>
         <geometry>
-          <mesh filename="$(find reach_description)/meshes/bravo_7/1019-B.stl" />
+          <mesh filename="file://$(find reach_description)/meshes/bravo_7/1019-B.stl" />
         </geometry>
         <material name="${prefix}black" />
         <origin xyz="0.0 0.0 0.0"
@@ -111,7 +111,7 @@
     <link name="${prefix}1013_joint_link">
       <visual>
         <geometry>
-          <mesh filename="$(find reach_description)/meshes/bravo_7/1013-B.stl" />
+          <mesh filename="file://$(find reach_description)/meshes/bravo_7/1013-B.stl" />
         </geometry>
         <material name="${prefix}black" />
         <origin xyz="0.0 0.0 0.0"
@@ -119,7 +119,7 @@
       </visual>
       <visual>
         <geometry>
-          <mesh filename="$(find reach_description)/meshes/bravo_7/RS2-1026-A.stl" />
+          <mesh filename="file://$(find reach_description)/meshes/bravo_7/RS2-1026-A.stl" />
         </geometry>
         <material name="${prefix}black" />
         <origin xyz="0.04600000000128156 4.829533423884964e-07 -0.23533999999935923"
@@ -127,7 +127,7 @@
       </visual>
       <visual>
         <geometry>
-          <mesh filename="$(find reach_description)/meshes/bravo_7/1030.stl" />
+          <mesh filename="file://$(find reach_description)/meshes/bravo_7/1030.stl" />
         </geometry>
         <material name="${prefix}black" />
         <origin xyz="0.046 0.0 -0.05334"
@@ -229,7 +229,7 @@
     <link name="${prefix}1026_0_joint_link">
       <visual>
         <geometry>
-          <mesh filename="$(find reach_description)/meshes/bravo_7/RS2-1026-B.stl" />
+          <mesh filename="file://$(find reach_description)/meshes/bravo_7/RS2-1026-B.stl" />
         </geometry>
         <material name="${prefix}black" />
         <origin xyz="0.0 0.0 0.0"
@@ -267,7 +267,7 @@
     <link name="${prefix}1026_1_joint_link">
       <visual>
         <geometry>
-          <mesh filename="$(find reach_description)/meshes/bravo_7/RS2-1026-C.stl" />
+          <mesh filename="file://$(find reach_description)/meshes/bravo_7/RS2-1026-C.stl" />
         </geometry>
         <material name="${prefix}black" />
         <origin xyz="0.0 0.0 0.0"
@@ -275,7 +275,7 @@
       </visual>
       <visual>
         <geometry>
-          <mesh filename="$(find reach_description)/meshes/bravo_7/RS2-1023-A.stl" />
+          <mesh filename="file://$(find reach_description)/meshes/bravo_7/RS2-1023-A.stl" />
         </geometry>
         <material name="${prefix}black" />
         <origin xyz="0.0 0.0 0.0054"
@@ -321,7 +321,7 @@
     <link name="${prefix}1023_0_joint_link">
       <visual>
         <geometry>
-          <mesh filename="$(find reach_description)/meshes/bravo_7/RS2-1023-B.stl" />
+          <mesh filename="file://$(find reach_description)/meshes/bravo_7/RS2-1023-B.stl" />
         </geometry>
         <material name="${prefix}black" />
         <origin xyz="0.0 0.0 0.0"
@@ -381,7 +381,7 @@
       <link name="${prefix}1023_1_joint_link">
         <visual>
           <geometry>
-            <mesh filename="$(find reach_description)/meshes/bravo_7/RS2-1023-C.stl" />
+            <mesh filename="file://$(find reach_description)/meshes/bravo_7/RS2-1023-C.stl" />
           </geometry>
           <material name="${prefix}black" />
           <origin xyz="0.0 0.0 0.0"
@@ -389,7 +389,7 @@
         </visual>
         <visual>
           <geometry>
-            <mesh filename="$(find reach_description)/meshes/bravo_7/1038.stl" />
+            <mesh filename="file://$(find reach_description)/meshes/bravo_7/1038.stl" />
           </geometry>
           <material name="${prefix}black" />
           <origin xyz="0.0 0.0 0.0054"
@@ -423,8 +423,6 @@
                   rpy="0.0 -0.0 0.0" />
         </collision>
       </link>
-
-      <insert_block name="end_effector" />
     </xacro:if>
 
 
@@ -443,7 +441,7 @@
         </inertial>
         <visual>
           <geometry>
-            <mesh filename="$(find reach_description)/meshes/bravo_7/RS2-1023-C.stl" />
+            <mesh filename="file://$(find reach_description)/meshes/bravo_7/RS2-1023-C.stl" />
           </geometry>
           <material name="${prefix}black" />
           <origin xyz="0.0 0.0 0.0"
@@ -451,7 +449,7 @@
         </visual>
         <visual>
           <geometry>
-            <mesh filename="$(find reach_description)/meshes/bravo_7/1038.stl" />
+            <mesh filename="file://$(find reach_description)/meshes/bravo_7/1038.stl" />
           </geometry>
           <material name="${prefix}black" />
           <origin xyz="0.0 0.0 0.0054"
@@ -489,15 +487,6 @@
                  izz="0.0021819948567845843" />
       </inertial>
     </link>
-
-    <xacro:include filename="$(find reach_description)/description/bravo_7/end_effectors/standard_jaws.urdf.xacro" />
-
-    <xacro:standard_jaws_urdf parent="${prefix}ee_base_link"
-                              prefix="${prefix}standard_jaws_"
-                              axis_a="${prefix}axis_a">
-      <origin xyz="0 0 0"
-              rpy="0 0 0" />
-    </xacro:standard_jaws_urdf>
 
     <!-- Joints -->
     <joint name="${prefix}base_joint"
@@ -641,6 +630,15 @@
              lower="0.0"
              upper="0.035" />
     </joint>
+
+    <xacro:include filename="$(find reach_description)/description/bravo_7/end_effectors/standard_jaws.urdf.xacro" />
+
+    <xacro:standard_jaws_urdf parent="${prefix}1023_1_joint_link"
+                              prefix="${prefix}standard_jaws_"
+                              axis_a="${prefix}axis_a">
+      <origin xyz="0 0 0"
+              rpy="0 0 0" />
+    </xacro:standard_jaws_urdf>
 
   </xacro:macro>
 
