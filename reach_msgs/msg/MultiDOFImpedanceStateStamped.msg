@@ -14,4 +14,6 @@ float64[] p_terms
 
 float64[] d_terms
 
+float64[] friction_terms
+
 float64[] outputs

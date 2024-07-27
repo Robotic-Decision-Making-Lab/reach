@@ -1,19 +1,50 @@
 impedance_controller:
-  stiffness: {
-    type: double_array,
+  enable_parameter_update_without_reactivation: {
+    type: bool,
+    default_value: true,
+    description: "If enabled, select parameters will be dynamically updated while the controller is running."
+  }
+  joints: {
+    type: string_array,
     default_value: [],
-    read_only: false,
-    Description: "Stiffness of the impedance controller at the joint level",
+    read_only: true,
+    description: "List of joints controlled by the impedance controller",
     validation: {
       not_empty<>: null
     }
   }
-  damping: {
+  reference_names: {
+    type: string_array,
+    default_value: [],
+    read_only: true,
+    description: "The names of the reference controllers. This can be used to configure command interfaces in chained mode.",
+  }
+  friction: {
     type: double_array,
     default_value: [],
+    description: "Joint friction (Nm)",
     read_only: false,
-    Description: "Damping of the impedance controller at the joint level",
     validation: {
       not_empty<>: null
     }
   }
+  gains:
+    __map_joints:
+      stiffness: {
+        type: double,
+        default_value: 0.0,
+        description: "Joint stiffness (Nm/rad)",
+        read_only: false,
+      }
+      damping: {
+        type: double,
+        default_value: 0.0,
+        description: "Joint damping (Nm*s/rad)",
+        read_only: false,
+      }
+      feedforward: {
+        type: double,
+        default_value: 0.0,
+        description: "Joint feedforward torque (Nm)",
+        read_only: false,
+      }

@@ -7,7 +7,7 @@
   <description>Launch files for Reach Robotics devices</description>
 
   <maintainer email="evanp922@gmail.com">Evan Palmer</maintainer>
-  <license>MIT</license>
+  <license>Reach Robotics License</license>
 
   <url type="repository">https://github.com/Robotic-Decision-Making-Lab/reach.git</url>
   <url type="bugtracker">https://github.com/Robotic-Decision-Making-Lab/reach/issues</url>

@@ -14,24 +14,26 @@
           <mesh filename="file://$(find reach_description)/meshes/bravo_7/end_effectors/RS2-257.stl" />
         </geometry>
         <material name="${prefix}black" />
-        <origin xyz="0.0 0.0 0.13074999999999998"
-                rpy="0.0 -1.5706999999997038 0.0" />
+        <origin xyz="0.0 0.0 0.13075"
+                rpy="0.0 -1.5707 0.0" />
       </visual>
       <inertial>
-        <mass value="0.01" />
-        <inertia ixx="0.0001"
+        <origin xyz="0.008269 0.0 0.13075"
+                rpy="0.0 -0.0 0.0" />
+        <mass value="0.64" />
+        <inertia ixx="0.0003"
                  ixy="0.0"
                  ixz="0.0"
-                 iyy="0.0001"
+                 iyy="0.002202"
                  iyz="0.0"
-                 izz="0.0001" />
+                 izz="0.002181" />
       </inertial>
       <collision>
         <geometry>
           <cylinder length="0.02"
                     radius="0.04" />
         </geometry>
-        <origin xyz="0.0 0.0 0.13074999999999998"
+        <origin xyz="0.0 0.0 0.13075"
                 rpy="0.0 0.0 0.0" />
       </collision>
     </link>
@@ -46,12 +48,12 @@
       <inertial>
         <mass value="0.24" />
         <origin xyz="0.05 0.0 0.0" />
-        <inertia ixx="${244 * 1e-6}"
-                 ixy="${-12 * 1e-6}"
-                 ixz="${0 * 1e-6}"
-                 iyy="${1130 * 1e-6}"
-                 iyz="${1 * 1e-6}"
-                 izz="${1178 * 1e-6}" />
+        <inertia ixx="0.001"
+                 ixy="0.0"
+                 ixz="0.0"
+                 iyy="0.001"
+                 iyz="0.0"
+                 izz="0.001" />
       </inertial>
       <collision>
         <geometry>
@@ -70,12 +72,12 @@
       <inertial>
         <mass value="0.24" />
         <origin xyz="0.05 0.0 0.0" />
-        <inertia ixx="${244 * 1e-6}"
-                 ixy="${-12 * 1e-6}"
-                 ixz="${0 * 1e-6}"
-                 iyy="${1130 * 1e-6}"
-                 iyz="${1 * 1e-6}"
-                 izz="${1178 * 1e-6}" />
+        <inertia ixx="0.001"
+                 ixy="0.0"
+                 ixz="0.0"
+                 iyy="0.001"
+                 iyz="0.0"
+                 izz="0.001" />
       </inertial>
       <collision>
         <geometry>

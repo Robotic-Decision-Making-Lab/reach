@@ -49,6 +49,11 @@ launch:
       args: joint_state_broadcaster --controller-manager controller_manager
 
   - node:
+      pkg: controller_manager
+      exec: spawner
+      args: impedance_controller --controller-manager controller_manager
+
+  - node:
       pkg: rviz2
       exec: rviz2
       if: $(var use_rviz)
