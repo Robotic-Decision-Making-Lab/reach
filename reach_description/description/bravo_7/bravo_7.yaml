@@ -1,0 +1,172 @@
+# Kinematic and dynamic parameters specified in the Reach Bravo 7 datasheet.
+
+frames:
+
+  # Frame 0
+  - link: base_link
+    revolute: false
+    dh:
+      d: 41.45
+      theta: 0.0
+      a: 67.5
+      alpha: 3.1416
+    mass: 1.85
+    com:
+      x: -15.0
+      y: 1.0
+      z: -2.0
+    inertia:
+      ixx: 2528.0
+      ixy: -20.0
+      ixz: 23.0
+      iyy: 2593.0
+      iyz: 7.0
+      izz: 3312.0
+
+  # Frame 1
+  - link: 1019_end_link
+    revolute: true
+    dh:
+      d: -117.48
+      theta: 3.1416
+      a: 46.0
+      alpha: -1.5708
+    mass: 1.62
+    com:
+      x: 31.0
+      y: 10.0
+      z: -98.0
+    inertia:
+      ixx: 3179.0
+      ixy: 233.0
+      ixz: -1024.0
+      iyy: 4209.0
+      iyz: -344.0
+      izz: 2387.0
+
+  # Frame 2
+  - link: 1013_joint_link
+    revolute: true
+    dh:
+      d: 0.0
+      theta: -1.5529
+      a: 290.8165
+      alpha: 0.0
+    mass: 2.12
+    com:
+      x: 176.0
+      y: 22.0
+      z: 4.0
+    inertia:
+      ixx: 3420.0
+      ixy: -1868.0
+      ixz: 156.0
+      iyy: 35166.0
+      iyz: -79.0
+      izz: 35981.0
+
+  # Frame 3
+  - link: 1026_0_joint_link
+    revolute: true
+    dh:
+      d: 0.0
+      theta: -1.5887
+      a: 40.8
+      alpha: -1.5708
+    mass: 1.33
+    com:
+      x: 34.0
+      y: -46.0
+      z: -3.0
+    inertia:
+      ixx: 1809.0
+      ixy: -398.0
+      ixz: 156.0
+      iyy: 1557.0
+      iyz: -197.0
+      izz: 2024.0
+
+  # Frame 4
+  - link: 1026_1_joint_link
+    revolute: true
+    dh:
+      d: -160.26
+      theta: 3.1416
+      a: 40.8
+      alpha: -1.5708
+    mass: 1.33
+    com:
+      x: 28.0
+      y: 12.0
+      z: -145.0
+    inertia:
+      ixx: 1983.0
+      ixy: 180.0
+      ixz: -641.0
+      iyy: 2676.0
+      iyz: -264.0
+      izz: 1526.0
+
+  # Frame 5
+  - link: 1023_0_joint_link
+    revolute: true
+    dh:
+      d: 0.0
+      theta: 0.0
+      a: 40.8
+      alpha: -1.5708
+    mass: 0.97
+    com:
+      x: 31.0
+      y: -39.0
+      z: -6.0
+    inertia:
+      ixx: 1977.0
+      ixy: 0.0
+      ixz: -15.0
+      iyy: 1986.0
+      iyz: 1.0
+      izz: 1035.0
+
+  # Frame 6 (with force/torque sensor)
+  - link: 1023_1_joint_link_ft
+    revolute: true
+    dh:
+      d: -284.16
+      theta: 0.0
+      a: 0.0
+      alpha: 1.5708
+    mass: 1.35
+    com:
+      x: 0.0
+      y: 0.0
+      z: -153.0
+    inertia:
+      ixx: 3542.0
+      ixy: -1.0
+      ixz: -21.0
+      iyy: 3549.0
+      iyz: 4.0
+      izz: 1281.0
+
+  # Frame 6 (without force/torque sensor)
+  - link: 1023_1_joint_link
+    revolute: true
+    dh:
+      d: -224.16
+      theta: 0.0
+      a: 0.0
+      alpha: 1.5708
+    mass: 1.09
+    com:
+      x: 0.0
+      y: 0.0
+      z: -127.0
+    inertia:
+      ixx: 1977.0
+      ixy: 0.0
+      ixz: -15.0
+      iyy: 1986.0
+      iyz: 1.0
+      izz: 2258.0
+

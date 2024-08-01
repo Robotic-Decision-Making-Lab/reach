@@ -1,0 +1,22 @@
+frames:
+
+  # Frame 7
+  - link: standard_jaws_base_link
+    revolute: false
+    dh:
+      d: 0.0
+      theta: -1.57079632679
+      a: 120.0
+      alpha: 0.0
+    mass: 0.64
+    com:
+      x: 1.0
+      y: 1.0
+      z: 0.0
+    inertia:
+      ixx: 2237.0
+      ixy: -18.0
+      ixz: 0.0
+      iyy: 309.0
+      iyz: 1.0
+      izz: 2258.0

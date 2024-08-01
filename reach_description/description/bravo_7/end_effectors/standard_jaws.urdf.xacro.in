@@ -1,0 +1,132 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://ros.org/wiki/xacro">
+
+  <xacro:macro name="standard_jaws_urdf"
+               params="parent prefix axis_a *origin">
+
+    <material name="${prefix}black">
+      <color rgba="0.3 0.3 0.3 1" />
+    </material>
+
+    <link name="${prefix}standard_jaws_base_link">
+      <visual>
+        <geometry>
+          <mesh filename="file://$(find reach_description)/meshes/bravo_7/end_effectors/RS2-257.stl" />
+        </geometry>
+        <material name="${prefix}black" />
+        <origin xyz="0.0 0.0 0.13075"
+                rpy="0.0 -1.5707 0.0" />
+      </visual>
+      <inertial>
+        <origin xyz="@standard_jaws_base_link_com_x @standard_jaws_base_link_com_y @standard_jaws_base_link_com_z"
+                rpy="@standard_jaws_base_link_com_roll @standard_jaws_base_link_com_pitch @standard_jaws_base_link_com_yaw" />
+        <mass value="@standard_jaws_base_link_mass" />
+        <inertia ixx="@standard_jaws_base_link_ixx"
+                 ixy="@standard_jaws_base_link_ixy"
+                 ixz="@standard_jaws_base_link_ixz"
+                 iyy="@standard_jaws_base_link_iyy"
+                 iyz="@standard_jaws_base_link_iyz"
+                 izz="@standard_jaws_base_link_izz" />
+      </inertial>
+      <collision>
+        <geometry>
+          <cylinder length="0.02"
+                    radius="0.04" />
+        </geometry>
+        <origin xyz="0.0 0.0 0.13075"
+                rpy="0.0 0.0 0.0" />
+      </collision>
+    </link>
+
+    <link name="${prefix}rs2_300_link">
+      <visual>
+        <geometry>
+          <mesh filename="file://$(find reach_description)/meshes/bravo_7/end_effectors/RS2-300.stl" />
+        </geometry>
+        <material name="${prefix}black" />
+      </visual>
+      <inertial>
+        <mass value="0.24" />
+        <origin xyz="0.05 0.0 0.0" />
+        <inertia ixx="0.001"
+                 ixy="0.0"
+                 ixz="0.0"
+                 iyy="0.001"
+                 iyz="0.0"
+                 izz="0.001" />
+      </inertial>
+      <collision>
+        <geometry>
+          <mesh filename="file://$(find reach_description)/meshes/bravo_7/end_effectors/RS2-300.stl" />
+        </geometry>
+      </collision>
+    </link>
+
+    <link name="${prefix}rs2_301_link">
+      <visual>
+        <geometry>
+          <mesh filename="file://$(find reach_description)/meshes/bravo_7/end_effectors/RS2-301.stl" />
+        </geometry>
+        <material name="${prefix}black" />
+      </visual>
+      <inertial>
+        <mass value="0.24" />
+        <origin xyz="0.05 0.0 0.0" />
+        <inertia ixx="0.001"
+                 ixy="0.0"
+                 ixz="0.0"
+                 iyy="0.001"
+                 iyz="0.0"
+                 izz="0.001" />
+      </inertial>
+      <collision>
+        <geometry>
+          <mesh filename="file://$(find reach_description)/meshes/bravo_7/end_effectors/RS2-301.stl" />
+        </geometry>
+      </collision>
+    </link>
+
+    <joint name="${prefix}base_joint"
+           type="fixed">
+      <xacro:insert_block name="origin" />
+      <parent link="${parent}" />
+      <child link="${prefix}base_link" />
+      <origin xyz="0.0 0.0 0.0"
+              rpy="0.0 0.0 0.0" />
+    </joint>
+
+    <joint name="${prefix}rs2_300_joint"
+           type="revolute">
+      <origin xyz="2.3214757534187783e-06 0.0268 0.15484999988818982"
+              rpy="0.0 -1.5706999999997038 0.0" />
+      <parent link="${prefix}base_link" />
+      <child link="${prefix}rs2_300_link" />
+      <axis xyz="0 0 -1" />
+      <limit lower="0.0"
+             upper="1.0"
+             effort="400"
+             velocity="10.0" />
+      <mimic joint="${axis_a}"
+             multiplier="18"
+             offset="0" />
+    </joint>
+
+    <joint name="${prefix}rs2_301_joint"
+           type="revolute">
+      <origin xyz="2.3214757534187783e-06 -0.0268 0.15484999988818982"
+              rpy="0.0 -1.5706999999997038 0.0" />
+      <parent link="${prefix}base_link" />
+      <child link="${prefix}rs2_301_link" />
+      <axis xyz="0 0 1" />
+      <limit lower="0"
+             upper="1.0"
+             effort="400"
+             velocity="10.0" />
+      <mimic joint="${prefix}rs2_300_joint"
+             multiplier="1"
+             offset="0" />
+    </joint>
+
+  </xacro:macro>
+
+</robot>

@@ -36,14 +36,20 @@ namespace reach::hardware
 namespace
 {
 
-// TODO(evan-palmer): Get these values
-const std::array<float, 7> TORQUE_CONSTANTS{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
+// NOTE: The Reach System Communication Protocol uses the opposite order for the Device IDs than what is used in the
+// dynamics/kinematics datasheet.
+
+// Kt, provided in the order of the Device IDs (V_pk / (rad/s))
+const std::array<float, 7> TORQUE_CONSTANTS{0.209, 0.209, 0.215, 0.215, 0.215, 0.222, 0.222};
+
+// Gr, provided in the order of the Device IDs
+const std::array<float, 7> GEAR_RATIO{39.27, 120.0, 120.0, 120.0, 120.0, 120.0, 120.0};
 
 /// Convert a torque (Nm) to current (mA) given the torque constant (Nm/A) and gear ratio
-auto convert_torque_to_current(float t, float Kt, float Gr = 120.0) -> float { return t / Kt / Gr * 1000.0; }
+auto convert_torque_to_current(float t, float Kt, float Gr) -> float { return t / Kt / Gr * 1000.0; }
 
 /// Convert a current (mA) to torque (Nm) given the torque constant (Nm/A) and gear ratio
-auto convert_current_to_torque(float c, float Kt, float Gr = 120.0) -> float { return c * Kt * Gr / 1000.0; }
+auto convert_current_to_torque(float c, float Kt, float Gr) -> float { return c * Kt * Gr / 1000.0; }
 
 }  // namespace
 
@@ -168,10 +174,11 @@ auto Bravo7Hardware::on_configure(const rclcpp_lifecycle::State & /* previous_st
   });
 
   bravo_->register_callback(libreach::PacketId::CURRENT, [this](const libreach::Packet & packet) {
-    const auto idx = static_cast<std::size_t>(packet.device_id()) - 1;
-    const float torque = convert_current_to_torque(libreach::deserialize<float>(packet), TORQUE_CONSTANTS[idx]);
+    const auto i = static_cast<std::size_t>(packet.device_id()) - 1;
+    const float torque =
+      convert_current_to_torque(libreach::deserialize<float>(packet), TORQUE_CONSTANTS[i], GEAR_RATIO[i]);
     const std::lock_guard<std::mutex> lock(torque_state_lock_);
-    async_states_torques_[idx] = static_cast<double>(torque);
+    async_states_torques_[i] = static_cast<double>(torque);
   });
 
   // Configure the state requests
@@ -297,6 +304,7 @@ auto Bravo7Hardware::read(const rclcpp::Time & /* time */, const rclcpp::Duratio
 auto Bravo7Hardware::write(const rclcpp::Time & /* time */, const rclcpp::Duration & /* period */)
   -> hardware_interface::return_type
 {
+  // TODO(evan-palmer): Saturate the commands as they approach the limits
   for (std::size_t i = 0; i < info_.joints.size(); ++i) {
     switch (control_modes_[i]) {
       case libreach::Mode::POSITION:
@@ -321,7 +329,7 @@ auto Bravo7Hardware::write(const rclcpp::Time & /* time */, const rclcpp::Durati
         break;
       case libreach::Mode::CURRENT:
         if (!std::isnan(hw_commands_torques_[i])) {
-          const float torque_d = convert_torque_to_current(hw_commands_torques_[i], TORQUE_CONSTANTS[i]);
+          const float torque_d = convert_torque_to_current(hw_commands_torques_[i], TORQUE_CONSTANTS[i], GEAR_RATIO[i]);
           bravo_->set_current(static_cast<std::uint8_t>(i + 1), static_cast<float>(torque_d));
         }
         break;

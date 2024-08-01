@@ -17,6 +17,8 @@
              default="true" />
   <xacro:arg name="initial_positions_file"
              default="initial_positions.yaml" />
+  <xacro:arg name="use_sim"
+             default="false" />
 
   <!-- Properties -->
   <xacro:property name="prefix"
@@ -39,6 +41,7 @@
                       port="$(arg port)"
                       state_request_rate="$(arg state_request_rate)"
                       initial_positions_file="$(arg initial_positions_file)"
+                      use_sim="$(arg use_sim)"
                       use_fake_hardware="$(arg use_fake_hardware)" />
 
 </robot>

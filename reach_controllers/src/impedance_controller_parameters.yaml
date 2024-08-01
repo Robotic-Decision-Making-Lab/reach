@@ -42,9 +42,3 @@ impedance_controller:
         description: "Joint damping (Nm*s/rad)",
         read_only: false,
       }
-      feedforward: {
-        type: double,
-        default_value: 0.0,
-        description: "Joint feedforward torque (Nm)",
-        read_only: false,
-      }

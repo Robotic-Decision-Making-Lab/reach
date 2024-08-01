@@ -29,17 +29,14 @@ add_library(reach_controllers SHARED)
 target_sources(reach_controllers PRIVATE src/impedance_controller.cpp)
 
 target_include_directories(
-  reach_controllers
+    reach_controllers
     PUBLIC
         $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
         $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
     PRIVATE ${PROJECT_SOURCE_DIR}/src
 )
 target_compile_features(reach_controllers PUBLIC cxx_std_20)
-target_link_libraries(
-    reach_controllers
-    PUBLIC impedance_controller_parameters
-)
+target_link_libraries(reach_controllers PUBLIC impedance_controller_parameters)
 ament_target_dependencies(reach_controllers
   PUBLIC
     ${THIS_PACKAGE_INCLUDE_DEPENDS}

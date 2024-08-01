@@ -99,6 +99,10 @@ RUN sudo apt-get -q update \
     && sudo apt-get clean -y \
     && sudo rm -rf /var/lib/apt/lists/*
 
+# Setup the Gazebo environment
+ENV GZ_SIM_RESOURCE_PATH=$USER_WORKSPACE/install/reach/share/reach_description/bravo/gazebo/worlds:$GZ_SIM_RESOURCE_PATH
+ENV GZ_SIM_RESOURCE_PATH=$USER_WORKSPACE/install/reach_description/share/reach_description/bravo/gazebo/models:$GZ_SIM_RESOURCE_PATH
+
 FROM desktop as desktop-nvidia
 
 # Install NVIDIA software
