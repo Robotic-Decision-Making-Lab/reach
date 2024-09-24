@@ -56,8 +56,6 @@ public:
 
   auto on_configure(const rclcpp_lifecycle::State & previous_state) -> hardware_interface::CallbackReturn override;
 
-  auto on_cleanup(const rclcpp_lifecycle::State & previous_state) -> hardware_interface::CallbackReturn override;
-
   auto prepare_command_mode_switch(
     const std::vector<std::string> & start_interfaces,
     const std::vector<std::string> & stop_interfaces) -> hardware_interface::return_type override;

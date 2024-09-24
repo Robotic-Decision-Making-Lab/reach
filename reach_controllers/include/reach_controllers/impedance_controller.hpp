@@ -63,13 +63,9 @@ public:
   // NOLINTNEXTLINE(modernize-use-nodiscard)
   auto state_interface_configuration() const -> controller_interface::InterfaceConfiguration override;
 
-  auto on_cleanup(const rclcpp_lifecycle::State & previous_state) -> controller_interface::CallbackReturn override;
-
   auto on_configure(const rclcpp_lifecycle::State & previous_state) -> controller_interface::CallbackReturn override;
 
   auto on_activate(const rclcpp_lifecycle::State & previous_state) -> controller_interface::CallbackReturn override;
-
-  auto on_deactivate(const rclcpp_lifecycle::State & previous_state) -> controller_interface::CallbackReturn override;
 
   auto update_and_write_commands(const rclcpp::Time & time, const rclcpp::Duration & period)
     -> controller_interface::return_type override;

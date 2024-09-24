@@ -1,6 +1,0 @@
-repositories:
-
-  libreach:
-    type: git
-    url: https://github.com/Robotic-Decision-Making-Lab/libreach
-    version: ros2

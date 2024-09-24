@@ -151,18 +151,6 @@ auto ImpedanceController::on_activate(const rclcpp_lifecycle::State & /*previous
   return controller_interface::CallbackReturn::SUCCESS;
 }
 
-auto ImpedanceController::on_deactivate(const rclcpp_lifecycle::State & /*previous_state */)
-  -> controller_interface::CallbackReturn
-{
-  return controller_interface::CallbackReturn::SUCCESS;
-}
-
-auto ImpedanceController::on_cleanup(const rclcpp_lifecycle::State & /*previous_state */)
-  -> controller_interface::CallbackReturn
-{
-  return controller_interface::CallbackReturn::SUCCESS;
-}
-
 auto ImpedanceController::on_set_chained_mode(bool /*chained_mode*/) -> bool { return true; }
 
 auto ImpedanceController::command_interface_configuration() const -> controller_interface::InterfaceConfiguration
@@ -283,8 +271,6 @@ auto ImpedanceController::update_and_write_commands(const rclcpp::Time & time, c
 
       // Add friction compensation
       command += joint_friction_[i];
-
-      // TODO(evan-palmer): do we need gravity compensation here?
     }
 
     command_interfaces_[i].set_value(command);

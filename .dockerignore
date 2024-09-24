@@ -7,5 +7,6 @@
 !reach_hardware
 !reach_controllers
 !reach_msgs
+!libreach
 
 !ros2.repos
