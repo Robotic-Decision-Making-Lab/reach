@@ -23,10 +23,11 @@
 // ACTION OF CONTRACT, TORT, OR OTHERWISE, ARISING FROM, OUT OF, OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#include "reach_hardware/bravo_7_hardware.hpp"
+#include "reach_hardware/alpha_5_hardware.hpp"
 
 #include <limits>
 
+#include "hardware_interface/hardware_info.hpp"
 #include "hardware_interface/types/hardware_interface_type_values.hpp"
 #include "rclcpp/rclcpp.hpp"
 
@@ -51,38 +52,62 @@ auto convert_torque_to_current(float t, float Kt, float Gr) -> float { return t 
 /// Convert a current (mA) to torque (Nm) given the torque constant (Nm/A) and gear ratio
 auto convert_current_to_torque(float c, float Kt, float Gr) -> float { return c * Kt * Gr / 1000.0; }
 
+auto map_device_ids_to_names(const std::vector<hardware_interface::ComponentInfo> & joints)
+  -> std::tuple<std::unordered_map<std::uint8_t, std::string>, std::unordered_map<std::string, std::uint8_t>>
+{
+  // Define a mapping between substrings and corresponding device IDs
+  const std::array<std::pair<std::string_view, std::uint8_t>, 5> name_to_id_mapping = {
+    {"axis_e", static_cast<std::uint8_t>(libreach::Alpha5DeviceId::JOINT_E)},
+    {"axis_d", static_cast<std::uint8_t>(libreach::Alpha5DeviceId::JOINT_D)},
+    {"axis_c", static_cast<std::uint8_t>(libreach::Alpha5DeviceId::JOINT_C)},
+    {"axis_b", static_cast<std::uint8_t>(libreach::Alpha5DeviceId::JOINT_B)},
+    {"axis_a", static_cast<std::uint8_t>(libreach::Alpha5DeviceId::JOINT_A)}};
+
+  std::unordered_map<std::uint8_t, std::string> device_ids_to_names;
+  std::unordered_map<std::string, std::uint8_t> names_to_device_ids;
+
+  for (const auto & joint : joints) {
+    const auto it = std::ranges::find_if(
+      name_to_id_mapping, [joint](const auto & pair) { return joint.name.find(pair.first) != std::string::npos; });
+
+    if (it != std::end(name_to_id_mapping)) {
+      device_ids_to_names[it->second] = joint.name;
+      names_to_device_ids[joint.name] = it->second;
+    }
+  }
+
+  return {device_ids_to_names, names_to_device_ids};
+}
+
 }  // namespace
 
-auto Bravo7Hardware::on_init(const hardware_interface::HardwareInfo & info) -> hardware_interface::CallbackReturn
+auto Alpha5Hardware::on_init(const hardware_interface::HardwareInfo & info) -> hardware_interface::CallbackReturn
 {
-  RCLCPP_INFO(logger_, "Initializing Bravo7Hardware system interface");  // NOLINT
+  RCLCPP_INFO(logger_, "Initializing Alpha5Hardware system interface");  // NOLINT
 
   if (hardware_interface::SystemInterface::on_init(info) != hardware_interface::CallbackReturn::SUCCESS) {
-    RCLCPP_INFO(logger_, "Failed to initialize Bravo7Hardware system interface");  // NOLINT
+    RCLCPP_INFO(logger_, "Failed to initialize Alpha5Hardware system interface");  // NOLINT
     return hardware_interface::CallbackReturn::ERROR;
   }
 
-  // Initialize the state vectors with NaNs
-  hw_states_positions_.resize(info_.joints.size(), std::numeric_limits<double>::quiet_NaN());
-  hw_states_velocities_.resize(info_.joints.size(), std::numeric_limits<double>::quiet_NaN());
-  hw_states_torques_.resize(info_.joints.size(), std::numeric_limits<double>::quiet_NaN());
+  for (const auto & [name, desc] : joint_state_interfaces_) {
+    async_states_positions_[name] = std::numeric_limits<double>::quiet_NaN();
+    async_states_velocities_[name] = std::numeric_limits<double>::quiet_NaN();
+    async_states_torques_[name] = std::numeric_limits<double>::quiet_NaN();
+  }
 
-  // Initialize the async state vectors with NaNs
-  async_states_positions_.resize(info_.joints.size(), std::numeric_limits<double>::quiet_NaN());
-  async_states_velocities_.resize(info_.joints.size(), std::numeric_limits<double>::quiet_NaN());
-  async_states_torques_.resize(info_.joints.size(), std::numeric_limits<double>::quiet_NaN());
+  std::tie(device_ids_to_names_, names_to_device_ids_) = map_device_ids_to_names(info_.joints);
 
-  // Initialize the command vectors with NaNs
-  hw_commands_positions_.resize(info_.joints.size(), std::numeric_limits<double>::quiet_NaN());
-  hw_commands_velocities_.resize(info_.joints.size(), std::numeric_limits<double>::quiet_NaN());
-  hw_commands_torques_.resize(info_.joints.size(), std::numeric_limits<double>::quiet_NaN());
+  if (device_ids_to_names_.size() != info_.joints.size() || names_to_device_ids_.size() != info_.joints.size()) {
+    RCLCPP_ERROR(logger_, "Failed to map joint names to Alpha device IDs.");  // NOLINT
+    return hardware_interface::CallbackReturn::ERROR;
+  }
 
   // Set the default control mode
   control_modes_.resize(info_.joints.size(), libreach::Mode::STANDBY);
 
   // Load the ROS params
-  ip_address_ = info_.hardware_parameters["ip_address"];
-  port_ = std::stoi(info_.hardware_parameters["port"]);
+  serial_port_ = info_.hardware_parameters["serial_port"];
   state_request_rate_ = std::chrono::milliseconds(std::stoi(info_.hardware_parameters["state_request_rate"]));
 
   // Check the state/command interfaces
@@ -138,63 +163,70 @@ auto Bravo7Hardware::on_init(const hardware_interface::HardwareInfo & info) -> h
     }
   }
 
-  RCLCPP_INFO(logger_, "Successfully initialized Bravo7Hardware system interface");  // NOLINT
+  RCLCPP_INFO(logger_, "Successfully initialized Alpha5Hardware system interface");  // NOLINT
 
   return hardware_interface::CallbackReturn::SUCCESS;
 }
 
-auto Bravo7Hardware::on_configure(const rclcpp_lifecycle::State & /* previous_state */)
+auto Alpha5Hardware::on_configure(const rclcpp_lifecycle::State & /* previous_state */)
   -> hardware_interface::CallbackReturn
 {
   // Use a multi-worker configuration
   const std::size_t buffer_size = 100;
   const std::size_t num_workers = 5;
 
+  // Reset the state and command values
+  for (const auto & [name, desc] : joint_state_interfaces_) {
+    set_state(name, std::numeric_limits<double>::quiet_NaN());
+  }
+
+  for (const auto & [name, desc] : joint_command_interfaces_) {
+    set_command(name, std::numeric_limits<double>::quiet_NaN());
+  }
+
   try {
-    bravo_ = std::make_unique<libreach::UdpDriver>(ip_address_, port_, buffer_size, num_workers);
+    alpha_ = std::make_unique<libreach::SerialDriver>(serial_port_, buffer_size, num_workers);
   }
   catch (const std::exception & e) {
-    RCLCPP_ERROR(logger_, "Failed to configure UDP driver: %s", e.what());  // NOLINT
+    RCLCPP_ERROR(logger_, "Failed to configure serial driver: %s", e.what());  // NOLINT
     return hardware_interface::CallbackReturn::ERROR;
   }
 
   // Register the state callbacks
-  bravo_->register_callback(libreach::PacketId::POSITION, [this](const libreach::Packet & packet) {
-    const auto idx = static_cast<std::size_t>(packet.device_id()) - 1;
+  alpha_->register_callback(libreach::PacketId::POSITION, [this](const libreach::Packet & packet) {
     const auto position = static_cast<double>(libreach::deserialize<float>(packet));
     const std::lock_guard<std::mutex> lock(position_state_lock_);
-    async_states_positions_[idx] = position;
+    async_states_positions_[device_ids_to_names_[packet.device_id()]] = position;
   });
 
-  bravo_->register_callback(libreach::PacketId::VELOCITY, [this](const libreach::Packet & packet) {
-    const auto idx = static_cast<std::size_t>(packet.device_id()) - 1;
+  alpha_->register_callback(libreach::PacketId::VELOCITY, [this](const libreach::Packet & packet) {
     const auto velocity = static_cast<double>(libreach::deserialize<float>(packet));
     const std::lock_guard<std::mutex> lock(velocity_state_lock_);
-    async_states_velocities_[idx] = velocity;
+    async_states_velocities_[device_ids_to_names_[packet.device_id()]] = velocity;
   });
 
-  bravo_->register_callback(libreach::PacketId::CURRENT, [this](const libreach::Packet & packet) {
-    const auto i = static_cast<std::size_t>(packet.device_id()) - 1;
+  alpha_->register_callback(libreach::PacketId::CURRENT, [this](const libreach::Packet & packet) {
     const float torque =
       convert_current_to_torque(libreach::deserialize<float>(packet), TORQUE_CONSTANTS[i], GEAR_RATIO[i]);
     const std::lock_guard<std::mutex> lock(torque_state_lock_);
     async_states_torques_[i] = static_cast<double>(torque);
+    async_states_torques_[device_ids_to_names_[packet.device_id()]] = torque;
   });
 
   // Configure the state requests
-  for (std::size_t i = 1; i < hw_states_positions_.size() + 1; ++i) {
-    bravo_->request_at_rate(
+  for (std::size_t i = 1; i < joint_state_interfaces_.size() + 1; ++i) {
+    alpha_->request_at_rate(
       {libreach::PacketId::POSITION, libreach::PacketId::VELOCITY, libreach::PacketId::CURRENT},
       i,
       state_request_rate_);
   }
 
-  RCLCPP_INFO(logger_, "Successfully configured the Bravo7Hardware system interface");  // NOLINT
+  RCLCPP_INFO(logger_, "Successfully configured the Alpha5Hardware system interface");  // NOLINT
 
   return hardware_interface::CallbackReturn::SUCCESS;
 }
 
-auto Bravo7Hardware::prepare_command_mode_switch(
+auto Alpha5Hardware::prepare_command_mode_switch(
   const std::vector<std::string> & start_interfaces,
   const std::vector<std::string> & /* stop_interfaces */) -> hardware_interface::return_type
 {
@@ -228,62 +260,36 @@ auto Bravo7Hardware::prepare_command_mode_switch(
   return hardware_interface::return_type::OK;
 }
 
-auto Bravo7Hardware::perform_command_mode_switch(
+auto Alpha5Hardware::perform_command_mode_switch(
   const std::vector<std::string> & /* start_interfaces */,
   const std::vector<std::string> & /* stop_interfaces */) -> hardware_interface::return_type
 {
   // Stop all joints
-  bravo_->set_velocity(static_cast<std::uint8_t>(libreach::Bravo7DeviceId::ALL_JOINTS), 0.0);
+  alpha_->set_velocity(static_cast<std::uint8_t>(libreach::Alpha5DeviceId::ALL_JOINTS), 0.0);
 
   // Perform the mode switch
   for (std::size_t i = 0; i < info_.joints.size(); ++i) {
-    bravo_->set_mode(static_cast<std::uint8_t>(i + 1), control_modes_[i]);
+    alpha_->set_mode(static_cast<std::uint8_t>(i + 1), control_modes_[i]);
   }
 
   return hardware_interface::return_type::OK;
 }
 
-auto Bravo7Hardware::export_state_interfaces() -> std::vector<hardware_interface::StateInterface>
-{
-  std::vector<hardware_interface::StateInterface> state_interfaces;
-
-  for (std::size_t i = 0; i < info_.joints.size(); ++i) {
-    state_interfaces.emplace_back(info_.joints[i].name, hardware_interface::HW_IF_POSITION, &hw_states_positions_[i]);
-    state_interfaces.emplace_back(info_.joints[i].name, hardware_interface::HW_IF_VELOCITY, &hw_states_velocities_[i]);
-    state_interfaces.emplace_back(info_.joints[i].name, hardware_interface::HW_IF_EFFORT, &hw_states_torques_[i]);
-  }
-
-  return state_interfaces;
-}
-
-auto Bravo7Hardware::export_command_interfaces() -> std::vector<hardware_interface::CommandInterface>
-{
-  std::vector<hardware_interface::CommandInterface> cmd_interfaces;
-
-  for (std::size_t i = 0; i < info_.joints.size(); ++i) {
-    cmd_interfaces.emplace_back(info_.joints[i].name, hardware_interface::HW_IF_POSITION, &hw_commands_positions_[i]);
-    cmd_interfaces.emplace_back(info_.joints[i].name, hardware_interface::HW_IF_VELOCITY, &hw_commands_velocities_[i]);
-    cmd_interfaces.emplace_back(info_.joints[i].name, hardware_interface::HW_IF_EFFORT, &hw_commands_torques_[i]);
-  }
-
-  return cmd_interfaces;
-}
-
-auto Bravo7Hardware::on_activate(const rclcpp_lifecycle::State & /* previous_state */)
+auto Alpha5Hardware::on_activate(const rclcpp_lifecycle::State & /* previous_state */)
   -> hardware_interface::CallbackReturn
 {
-  bravo_->set_mode(static_cast<std::uint8_t>(libreach::Bravo7DeviceId::ALL_JOINTS), libreach::Mode::STANDBY);
+  alpha_->set_mode(static_cast<std::uint8_t>(libreach::Bravo7DeviceId::ALL_JOINTS), libreach::Mode::STANDBY);
   return hardware_interface::CallbackReturn::SUCCESS;
 }
 
-auto Bravo7Hardware::on_deactivate(const rclcpp_lifecycle::State & /* previous_state */)
+auto Alpha5Hardware::on_deactivate(const rclcpp_lifecycle::State & /* previous_state */)
   -> hardware_interface::CallbackReturn
 {
-  bravo_->set_mode(static_cast<std::uint8_t>(libreach::Bravo7DeviceId::ALL_JOINTS), libreach::Mode::DISABLE);
+  alpha_->set_mode(static_cast<std::uint8_t>(libreach::Bravo7DeviceId::ALL_JOINTS), libreach::Mode::DISABLE);
   return hardware_interface::CallbackReturn::SUCCESS;
 }
 
-auto Bravo7Hardware::read(const rclcpp::Time & /* time */, const rclcpp::Duration & /* period */)
+auto Alpha5Hardware::read(const rclcpp::Time & /* time */, const rclcpp::Duration & /* period */)
   -> hardware_interface::return_type
 {
   const std::scoped_lock lock{position_state_lock_, velocity_state_lock_, torque_state_lock_};
@@ -295,7 +301,7 @@ auto Bravo7Hardware::read(const rclcpp::Time & /* time */, const rclcpp::Duratio
   return hardware_interface::return_type::OK;
 }
 
-auto Bravo7Hardware::write(const rclcpp::Time & /* time */, const rclcpp::Duration & /* period */)
+auto Alpha5Hardware::write(const rclcpp::Time & /* time */, const rclcpp::Duration & /* period */)
   -> hardware_interface::return_type
 {
   // TODO(evan-palmer): Saturate the commands as they approach the limits
@@ -308,7 +314,7 @@ auto Bravo7Hardware::write(const rclcpp::Time & /* time */, const rclcpp::Durati
                                       ? hw_commands_positions_[i] * 1000.0
                                       : hw_commands_positions_[i];
 
-          bravo_->set_position(static_cast<std::uint8_t>(i + 1), static_cast<float>(position_d));
+          alpha_->set_position(static_cast<std::uint8_t>(i + 1), static_cast<float>(position_d));
         }
         break;
       case libreach::Mode::VELOCITY:
@@ -318,13 +324,13 @@ auto Bravo7Hardware::write(const rclcpp::Time & /* time */, const rclcpp::Durati
                                       ? hw_commands_velocities_[i] * 1000.0
                                       : hw_commands_velocities_[i];
 
-          bravo_->set_velocity(static_cast<std::uint8_t>(i + 1), static_cast<float>(velocity_d));
+          alpha_->set_velocity(static_cast<std::uint8_t>(i + 1), static_cast<float>(velocity_d));
         }
         break;
       case libreach::Mode::CURRENT:
         if (!std::isnan(hw_commands_torques_[i])) {
           const float torque_d = convert_torque_to_current(hw_commands_torques_[i], TORQUE_CONSTANTS[i], GEAR_RATIO[i]);
-          bravo_->set_current(static_cast<std::uint8_t>(i + 1), static_cast<float>(torque_d));
+          alpha_->set_current(static_cast<std::uint8_t>(i + 1), static_cast<float>(torque_d));
         }
         break;
       default:
@@ -338,4 +344,4 @@ auto Bravo7Hardware::write(const rclcpp::Time & /* time */, const rclcpp::Durati
 }  // namespace reach::hardware
 
 #include "pluginlib/class_list_macros.hpp"
-PLUGINLIB_EXPORT_CLASS(reach::hardware::Bravo7Hardware, hardware_interface::SystemInterface)
+PLUGINLIB_EXPORT_CLASS(reach::hardware::Alpha5Hardware, hardware_interface::SystemInterface)

@@ -1,6 +1,6 @@
 {
   "name": "ROS 2 NVIDIA Dev Container",
-  "dockerFile": "Dockerfile",
+  "dockerFile": "../Dockerfile",
   "context": "../..",
   "workspaceMount": "source=${localWorkspaceFolder},target=/home/ubuntu/ws_ros/src/reach,type=bind",
   "workspaceFolder": "/home/ubuntu/ws_ros/src/reach",

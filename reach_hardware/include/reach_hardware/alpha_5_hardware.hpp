@@ -39,7 +39,7 @@
 #include "libreach/mode.hpp"
 #include "libreach/packet.hpp"
 #include "libreach/packet_id.hpp"
-#include "libreach/udp_driver.hpp"
+#include "libreach/serial_driver.hpp"
 #include "rclcpp/macros.hpp"
 #include "rclcpp/rclcpp.hpp"
 #include "rclcpp_lifecycle/state.hpp"
@@ -47,10 +47,10 @@
 namespace reach::hardware
 {
 
-class Bravo7Hardware : public hardware_interface::SystemInterface
+class Alpha5Hardware : public hardware_interface::SystemInterface
 {
 public:
-  RCLCPP_SHARED_PTR_DEFINITIONS(Bravo7Hardware)  // NOLINT
+  RCLCPP_SHARED_PTR_DEFINITIONS(Alpha5Hardware)  // NOLINT
 
   auto on_init(const hardware_interface::HardwareInfo & info) -> hardware_interface::CallbackReturn override;
 
@@ -64,10 +64,6 @@ public:
     const std::vector<std::string> & start_interfaces,
     const std::vector<std::string> & stop_interfaces) -> hardware_interface::return_type override;
 
-  auto export_state_interfaces() -> std::vector<hardware_interface::StateInterface> override;
-
-  auto export_command_interfaces() -> std::vector<hardware_interface::CommandInterface> override;
-
   auto on_activate(const rclcpp_lifecycle::State & previous_state) -> hardware_interface::CallbackReturn override;
 
   auto on_deactivate(const rclcpp_lifecycle::State & previous_state) -> hardware_interface::CallbackReturn override;
@@ -77,25 +73,24 @@ public:
   auto write(const rclcpp::Time & time, const rclcpp::Duration & period) -> hardware_interface::return_type override;
 
 private:
-  std::unique_ptr<libreach::UdpDriver> bravo_;
+  std::unique_ptr<libreach::SerialDriver> alpha_;
 
   // ROS parameters
-  std::string ip_address_;
-  std::uint16_t port_;
+  std::string serial_port_;
   std::chrono::milliseconds state_request_rate_;
 
-  // command interfaces
-  std::vector<double> hw_commands_velocities_, hw_commands_positions_, hw_commands_torques_;
-
-  // state interfaces
-  std::vector<double> async_states_velocities_, async_states_positions_, async_states_torques_;
-  std::vector<double> hw_states_velocities_, hw_states_positions_, hw_states_torques_;
+  // RT state interfaces
+  std::unordered_map<std::string, float> async_states_velocities_, async_states_positions_, async_states_torques_;
   std::mutex position_state_lock_, velocity_state_lock_, torque_state_lock_;
+
+  // Keep track of the mapping between joint names and device IDs
+  std::unordered_map<std::uint8_t, std::string> device_ids_to_names_;
+  std::unordered_map<std::string, std::uint8_t> names_to_device_ids_;
 
   // Device operating modes
   std::vector<libreach::Mode> control_modes_;
 
-  rclcpp::Logger logger_{rclcpp::get_logger("bravo_7_hardware")};
+  rclcpp::Logger logger_{rclcpp::get_logger("alpha_5_hardware")};
 };
 
 }  // namespace reach::hardware
