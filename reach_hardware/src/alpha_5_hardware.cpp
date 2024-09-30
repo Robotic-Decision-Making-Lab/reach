@@ -52,55 +52,82 @@ auto convert_torque_to_current(float t, float Kt, float Gr) -> float { return t 
 /// Convert a current (mA) to torque (Nm) given the torque constant (Nm/A) and gear ratio
 auto convert_current_to_torque(float c, float Kt, float Gr) -> float { return c * Kt * Gr / 1000.0; }
 
-auto map_device_ids_to_names(const std::vector<hardware_interface::ComponentInfo> & joints)
-  -> std::tuple<std::unordered_map<std::uint8_t, std::string>, std::unordered_map<std::string, std::uint8_t>>
+const std::vector<std::string> VALID_COMMAND_INTERFACES{
+  hardware_interface::HW_IF_POSITION,
+  hardware_interface::HW_IF_VELOCITY,
+  hardware_interface::HW_IF_EFFORT};
+
+const std::vector<std::string> VALID_STATE_INTERFACES{
+  hardware_interface::HW_IF_POSITION,
+  hardware_interface::HW_IF_VELOCITY,
+  hardware_interface::HW_IF_EFFORT};
+
+/// Verify that the provided interfaces are the correct size and use a supported interface type
+auto validate_interfaces(
+  const std::vector<hardware_interface::InterfaceInfo> & interfaces,
+  const std::vector<std::string> & valid_interfaces) -> bool
 {
-  // Define a mapping between substrings and corresponding device IDs
-  const std::array<std::pair<std::string_view, std::uint8_t>, 5> name_to_id_mapping = {
-    {"axis_e", static_cast<std::uint8_t>(libreach::Alpha5DeviceId::JOINT_E)},
-    {"axis_d", static_cast<std::uint8_t>(libreach::Alpha5DeviceId::JOINT_D)},
-    {"axis_c", static_cast<std::uint8_t>(libreach::Alpha5DeviceId::JOINT_C)},
-    {"axis_b", static_cast<std::uint8_t>(libreach::Alpha5DeviceId::JOINT_B)},
-    {"axis_a", static_cast<std::uint8_t>(libreach::Alpha5DeviceId::JOINT_A)}};
-
-  std::unordered_map<std::uint8_t, std::string> device_ids_to_names;
-  std::unordered_map<std::string, std::uint8_t> names_to_device_ids;
-
-  for (const auto & joint : joints) {
-    const auto it = std::ranges::find_if(
-      name_to_id_mapping, [joint](const auto & pair) { return joint.name.find(pair.first) != std::string::npos; });
-
-    if (it != std::end(name_to_id_mapping)) {
-      device_ids_to_names[it->second] = joint.name;
-      names_to_device_ids[joint.name] = it->second;
-    }
+  if (interfaces.size() != valid_interfaces.size()) {
+    return false;
   }
 
-  return {device_ids_to_names, names_to_device_ids};
+  return std::ranges::all_of(interfaces, [valid_interfaces](const hardware_interface::InterfaceInfo & interface) {
+    return std::ranges::any_of(
+      valid_interfaces, [interface](const std::string & valid_interface) { return interface.name == valid_interface; });
+  });
 }
 
 }  // namespace
 
 auto Alpha5Hardware::on_init(const hardware_interface::HardwareInfo & info) -> hardware_interface::CallbackReturn
 {
-  RCLCPP_INFO(logger_, "Initializing Alpha5Hardware system interface");  // NOLINT
+  RCLCPP_INFO(logger_, "Initializing Alpha5Hardware system interface");
 
   if (hardware_interface::SystemInterface::on_init(info) != hardware_interface::CallbackReturn::SUCCESS) {
-    RCLCPP_INFO(logger_, "Failed to initialize Alpha5Hardware system interface");  // NOLINT
+    RCLCPP_INFO(logger_, "Failed to initialize Alpha5Hardware system interface");
     return hardware_interface::CallbackReturn::ERROR;
   }
 
   for (const auto & [name, desc] : joint_state_interfaces_) {
-    async_states_positions_[name] = std::numeric_limits<double>::quiet_NaN();
-    async_states_velocities_[name] = std::numeric_limits<double>::quiet_NaN();
-    async_states_torques_[name] = std::numeric_limits<double>::quiet_NaN();
+    async_states_[name] = std::numeric_limits<double>::quiet_NaN();
   }
 
-  std::tie(device_ids_to_names_, names_to_device_ids_) = map_device_ids_to_names(info_.joints);
+  for (const auto & joint : info_.joints) {
+    if (joint.parameters.find("device_id") == joint.parameters.end()) {
+      RCLCPP_ERROR(logger_, "Joint '%s' is missing the 'device_id' parameter", joint.name.c_str());
+      return hardware_interface::CallbackReturn::ERROR;
+    }
 
-  if (device_ids_to_names_.size() != info_.joints.size() || names_to_device_ids_.size() != info_.joints.size()) {
-    RCLCPP_ERROR(logger_, "Failed to map joint names to Alpha device IDs.");  // NOLINT
-    return hardware_interface::CallbackReturn::ERROR;
+    // Save the mapping between joint names and device IDs
+    const auto device_id = static_cast<std::uint8_t>(std::stoi(joint.parameters.at("device_id")));
+    device_ids_to_names_[device_id] = joint.name;
+    names_to_device_ids_[joint.name] = device_id;
+
+    if (!validate_interfaces(joint.command_interfaces, VALID_COMMAND_INTERFACES)) {
+      RCLCPP_ERROR(
+        logger_,
+        "Joint '%s' has invalid command interfaces. Verify that the joint has %zu command interfaces and is of a "
+        "supported type:",
+        joint.name.c_str(),
+        VALID_COMMAND_INTERFACES.size());
+      for (const auto & interface : VALID_COMMAND_INTERFACES) {
+        RCLCPP_ERROR(logger_, "  - %s", interface.c_str());
+      }
+      return hardware_interface::CallbackReturn::ERROR;
+    }
+
+    if (!validate_interfaces(joint.state_interfaces, VALID_STATE_INTERFACES)) {
+      RCLCPP_ERROR(
+        logger_,
+        "Joint '%s' has invalid state interfaces. Verify that the joint has %zu state interfaces and is of a "
+        "supported type:",
+        joint.name.c_str(),
+        VALID_STATE_INTERFACES.size());
+      for (const auto & interface : VALID_STATE_INTERFACES) {
+        RCLCPP_ERROR(logger_, "  - %s", interface.c_str());
+      }
+      return hardware_interface::CallbackReturn::ERROR;
+    }
   }
 
   // Set the default control mode
@@ -110,59 +137,6 @@ auto Alpha5Hardware::on_init(const hardware_interface::HardwareInfo & info) -> h
   serial_port_ = info_.hardware_parameters["serial_port"];
   state_request_rate_ = std::chrono::milliseconds(std::stoi(info_.hardware_parameters["state_request_rate"]));
 
-  // Check the state/command interfaces
-  for (const hardware_interface::ComponentInfo & joint : info_.joints) {
-    if (joint.command_interfaces.size() != 3) {
-      RCLCPP_ERROR(  // NOLINT
-        logger_,
-        "Joint '%s' has %zu command interfaces, expected 3",
-        joint.name.c_str(),
-        joint.command_interfaces.size());
-      return hardware_interface::CallbackReturn::ERROR;
-    }
-
-    const bool command_interface_valid = joint.command_interfaces.front().name == hardware_interface::HW_IF_POSITION ||
-                                         joint.command_interfaces.front().name == hardware_interface::HW_IF_VELOCITY ||
-                                         joint.command_interfaces.front().name == hardware_interface::HW_IF_EFFORT;
-
-    if (!command_interface_valid) {
-      RCLCPP_ERROR(  // NOLINT
-        logger_,
-        "Joint '%s' has command interface '%s', expected '%s', '%s', or '%s'",
-        joint.name.c_str(),
-        joint.command_interfaces.front().name.c_str(),
-        hardware_interface::HW_IF_POSITION,
-        hardware_interface::HW_IF_VELOCITY,
-        hardware_interface::HW_IF_EFFORT);
-      return hardware_interface::CallbackReturn::ERROR;
-    }
-
-    if (joint.state_interfaces.size() != 3) {
-      RCLCPP_ERROR(  // NOLINT
-        logger_,
-        "Joint '%s' has %zu state interfaces, expected 3",
-        joint.name.c_str(),
-        joint.state_interfaces.size());
-      return hardware_interface::CallbackReturn::ERROR;
-    }
-
-    const bool state_interface_valid = joint.state_interfaces.front().name == hardware_interface::HW_IF_POSITION ||
-                                       joint.state_interfaces.front().name == hardware_interface::HW_IF_VELOCITY ||
-                                       joint.state_interfaces.front().name == hardware_interface::HW_IF_EFFORT;
-
-    if (!state_interface_valid) {
-      RCLCPP_ERROR(  // NOLINT
-        logger_,
-        "Joint '%s' has state interface '%s', expected '%s', '%s', or '%s'",
-        joint.name.c_str(),
-        joint.state_interfaces.front().name.c_str(),
-        hardware_interface::HW_IF_POSITION,
-        hardware_interface::HW_IF_VELOCITY,
-        hardware_interface::HW_IF_EFFORT);
-      return hardware_interface::CallbackReturn::ERROR;
-    }
-  }
-
   RCLCPP_INFO(logger_, "Successfully initialized Alpha5Hardware system interface");  // NOLINT
 
   return hardware_interface::CallbackReturn::SUCCESS;
@@ -171,10 +145,6 @@ auto Alpha5Hardware::on_init(const hardware_interface::HardwareInfo & info) -> h
 auto Alpha5Hardware::on_configure(const rclcpp_lifecycle::State & /* previous_state */)
   -> hardware_interface::CallbackReturn
 {
-  // Use a multi-worker configuration
-  const std::size_t buffer_size = 100;
-  const std::size_t num_workers = 5;
-
   // Reset the state and command values
   for (const auto & [name, desc] : joint_state_interfaces_) {
     set_state(name, std::numeric_limits<double>::quiet_NaN());
@@ -185,6 +155,9 @@ auto Alpha5Hardware::on_configure(const rclcpp_lifecycle::State & /* previous_st
   }
 
   try {
+    // Use a multi-worker configuration
+    const std::size_t buffer_size = 100;
+    const std::size_t num_workers = 5;
     alpha_ = std::make_unique<libreach::SerialDriver>(serial_port_, buffer_size, num_workers);
   }
   catch (const std::exception & e) {
@@ -195,22 +168,25 @@ auto Alpha5Hardware::on_configure(const rclcpp_lifecycle::State & /* previous_st
   // Register the state callbacks
   alpha_->register_callback(libreach::PacketId::POSITION, [this](const libreach::Packet & packet) {
     const auto position = static_cast<double>(libreach::deserialize<float>(packet));
-    const std::lock_guard<std::mutex> lock(position_state_lock_);
-    async_states_positions_[device_ids_to_names_[packet.device_id()]] = position;
+    const std::string interface = device_ids_to_names_[packet.device_id()] + "/" + hardware_interface::HW_IF_POSITION;
+    const std::lock_guard<std::mutex> lock(async_state_lock_);
+    async_states_[interface] = position;
   });
 
   alpha_->register_callback(libreach::PacketId::VELOCITY, [this](const libreach::Packet & packet) {
     const auto velocity = static_cast<double>(libreach::deserialize<float>(packet));
-    const std::lock_guard<std::mutex> lock(velocity_state_lock_);
-    async_states_velocities_[device_ids_to_names_[packet.device_id()]] = velocity;
+    const std::string interface = device_ids_to_names_[packet.device_id()] + "/" + hardware_interface::HW_IF_VELOCITY;
+    const std::lock_guard<std::mutex> lock(async_state_lock_);
+    async_states_[interface] = velocity;
   });
 
   alpha_->register_callback(libreach::PacketId::CURRENT, [this](const libreach::Packet & packet) {
-    const float torque =
-      convert_current_to_torque(libreach::deserialize<float>(packet), TORQUE_CONSTANTS[i], GEAR_RATIO[i]);
-    const std::lock_guard<std::mutex> lock(torque_state_lock_);
-    async_states_torques_[i] = static_cast<double>(torque);
-    async_states_torques_[device_ids_to_names_[packet.device_id()]] = torque;
+    const auto idx = static_cast<std::size_t>(packet.device_id()) - 1;
+    const auto current = libreach::deserialize<float>(packet);
+    const float torque = convert_current_to_torque(current, TORQUE_CONSTANTS[idx], GEAR_RATIO[idx]);
+    const std::string interface = device_ids_to_names_[packet.device_id()] + "/" + hardware_interface::HW_IF_EFFORT;
+    const std::lock_guard<std::mutex> lock(async_state_lock_);
+    async_states_[interface] = torque;
   });
 
   // Configure the state requests
@@ -235,18 +211,18 @@ auto Alpha5Hardware::prepare_command_mode_switch(
   for (const auto & key : start_interfaces) {
     for (auto & joint : info_.joints) {
       if (key == joint.name + "/" + hardware_interface::HW_IF_POSITION) {
-        new_modes.emplace_back(libreach::Mode::POSITION);
+        new_modes.push_back(libreach::Mode::POSITION);
       } else if (key == joint.name + "/" + hardware_interface::HW_IF_VELOCITY) {
-        new_modes.emplace_back(libreach::Mode::VELOCITY);
+        new_modes.push_back(libreach::Mode::VELOCITY);
       } else if (key == joint.name + "/" + hardware_interface::HW_IF_EFFORT) {
-        new_modes.emplace_back(libreach::Mode::CURRENT);
+        new_modes.push_back(libreach::Mode::CURRENT);
       } else {
         RCLCPP_WARN(  // NOLINT
           logger_,
           "Unknown command mode for joint '%s': '%s'. Setting mode to 'STANDBY'",
           joint.name.c_str(),
           key.c_str());
-        new_modes.emplace_back(libreach::Mode::STANDBY);
+        new_modes.push_back(libreach::Mode::STANDBY);
       }
     }
   }
@@ -278,25 +254,25 @@ auto Alpha5Hardware::perform_command_mode_switch(
 auto Alpha5Hardware::on_activate(const rclcpp_lifecycle::State & /* previous_state */)
   -> hardware_interface::CallbackReturn
 {
-  alpha_->set_mode(static_cast<std::uint8_t>(libreach::Bravo7DeviceId::ALL_JOINTS), libreach::Mode::STANDBY);
+  alpha_->set_mode(static_cast<std::uint8_t>(libreach::Alpha5DeviceId::ALL_JOINTS), libreach::Mode::STANDBY);
   return hardware_interface::CallbackReturn::SUCCESS;
 }
 
 auto Alpha5Hardware::on_deactivate(const rclcpp_lifecycle::State & /* previous_state */)
   -> hardware_interface::CallbackReturn
 {
-  alpha_->set_mode(static_cast<std::uint8_t>(libreach::Bravo7DeviceId::ALL_JOINTS), libreach::Mode::DISABLE);
+  alpha_->set_mode(static_cast<std::uint8_t>(libreach::Alpha5DeviceId::ALL_JOINTS), libreach::Mode::DISABLE);
   return hardware_interface::CallbackReturn::SUCCESS;
 }
 
 auto Alpha5Hardware::read(const rclcpp::Time & /* time */, const rclcpp::Duration & /* period */)
   -> hardware_interface::return_type
 {
-  const std::scoped_lock lock{position_state_lock_, velocity_state_lock_, torque_state_lock_};
+  const std::lock_guard<std::mutex> lock(async_state_lock_);
 
-  hw_states_positions_ = async_states_positions_;
-  hw_states_velocities_ = async_states_velocities_;
-  hw_states_torques_ = async_states_torques_;
+  for (const auto & [name, desc] : joint_state_interfaces_) {
+    set_state(name, async_states_[name]);
+  }
 
   return hardware_interface::return_type::OK;
 }
