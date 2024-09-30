@@ -4,13 +4,13 @@
 
   <name>reach_hardware</name>
   <version>0.1.0</version>
-  <description>ros2_control system hardware interface for the Reach Bravo 7</description>
+  <description>ros2_control system hardware interface for the Reach Robotics manipulators</description>
 
   <maintainer email="evanp922@gmail.com">Evan Palmer</maintainer>
   <license>MIT</license>
 
-  <url type="repository">https://github.com/Robotic-Decision-Making-Lab/bravo.git</url>
-  <url type="bugtracker">https://github.com/Robotic-Decision-Making-Lab/bravo/issues</url>
+  <url type="repository">https://github.com/Robotic-Decision-Making-Lab/reach.git</url>
+  <url type="bugtracker">https://github.com/Robotic-Decision-Making-Lab/reach/issues</url>
 
   <buildtool_depend>ament_cmake</buildtool_depend>
 

@@ -9,8 +9,8 @@
   <maintainer email="evanp922@gmail.com">Evan Palmer</maintainer>
   <license>Reach Robotics License</license>
 
-  <url type="repository">https://github.com/Robotic-Decision-Making-Lab/bravo.git</url>
-  <url type="bugtracker">https://github.com/Robotic-Decision-Making-Lab/bravo/issues</url>
+  <url type="repository">https://github.com/Robotic-Decision-Making-Lab/reach.git</url>
+  <url type="bugtracker">https://github.com/Robotic-Decision-Making-Lab/reach/issues</url>
 
   <buildtool_depend>ament_cmake</buildtool_depend>
   <buildtool_depend>rosidl_default_generators</buildtool_depend>
