@@ -80,15 +80,16 @@ private:
   std::chrono::milliseconds state_request_rate_;
 
   // RT state interfaces
-  std::unordered_map<std::string, float> async_states_;
-  std::mutex async_state_lock_;
+  // We maintain separate maps for each state interface to take advantage of the libreach multi-threaded callbacks
+  std::unordered_map<std::string, float> async_states_positions_, async_states_velocities_, async_states_efforts_;
+  std::mutex position_state_lock_, velocity_state_lock_, effort_state_lock_;
 
   // Keep track of the mapping between joint names and device IDs to speed up state/control updates
   std::unordered_map<std::uint8_t, std::string> device_ids_to_names_;
   std::unordered_map<std::string, std::uint8_t> names_to_device_ids_;
 
   // Device operating modes
-  std::vector<libreach::Mode> control_modes_;
+  std::unordered_map<std::string, libreach::Mode> control_modes_;
 
   rclcpp::Logger logger_{rclcpp::get_logger("alpha_5_hardware")};
 };
