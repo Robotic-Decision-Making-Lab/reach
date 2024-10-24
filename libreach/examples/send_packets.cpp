@@ -45,7 +45,7 @@ auto main() -> int
 
   // 1. Helper functions have been provided to execute a variety of command commands such as setting the position
   const float desired_position = 0.53;
-  driver.set_position(joint_a, desired_position);
+  driver.set_joint_position(joint_a, desired_position);
 
   // 2. If a helper function does not exist for a specific command, packets can be sent directly to the robot
   std::vector<std::uint8_t> bytes(sizeof(desired_position));

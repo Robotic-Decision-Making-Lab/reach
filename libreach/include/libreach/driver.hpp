@@ -31,7 +31,9 @@
 #include <condition_variable>
 #include <cstddef>
 #include <cstdint>
+#include <deque>
 #include <functional>
+#include <future>
 #include <memory>
 #include <mutex>
 #include <queue>
@@ -60,10 +62,41 @@ public:
   auto set_mode(std::uint8_t device_id, Mode mode) const -> void;
 
   /// Set the desired velocity of a device (rad/s for rotational joints, mm/s for linear).
-  auto set_velocity(std::uint8_t device_id, float velocity) const -> void;
+  auto set_joint_velocity(std::uint8_t device_id, float velocity) const -> void;
 
   /// Set the desired position of a device ([0, 2π] rad for rotational joints, mm for linear).
-  auto set_position(std::uint8_t device_id, float position) const -> void;
+  auto set_joint_position(std::uint8_t device_id, float position) const -> void;
+
+  /// Set the end-effector pose with respect to the base frame (mm for position, rad for rotation).
+  ///
+  /// For manipulators with less than 7 degrees of freedom, the orientation configurations are ignored.
+  ///
+  /// The device ID should be set to the manipulator base.
+  auto set_ee_pose(std::uint8_t device_id, float x, float y, float z, float rz, float ry, float rx) const -> void;
+
+  /// Set the end-effector position with respect to the base frame (mm).
+  ///
+  /// The device ID should be set to the manipulator base.
+  auto set_ee_pose(std::uint8_t device_id, float x, float y, float z) const -> void;
+
+  /// Set the global end-effector velocity (mm/s for linear velocity, rad/s for angular velocity).
+  ///
+  /// For manipulators with less than 7 degrees of freedom, the angular velocity configurations are ignored.
+  ///
+  /// The device ID should be set to the manipulator base.
+  auto set_ee_velocity(std::uint8_t device_id, float vx, float vy, float vz, float vrz, float vry, float vrx) const
+    -> void;
+
+  /// Set the global linear velocity of the end-effector (mm/s).
+  auto set_ee_velocity(std::uint8_t device_id, float vx, float vy, float vz) const -> void;
+
+  /// Set the local end-effector velocity (mm/s for linear velocity, rad/s for angular velocity).
+  ///
+  /// This feature is not supported on devices with less than 7 functions.
+  ///
+  /// The device ID should be set to the manipulator base.
+  auto set_local_ee_velocity(std::uint8_t device_id, float vx, float vy, float vz, float vrz, float vry, float vrx)
+    const -> void;
 
   /// Set the desired relative position of a device ([0, 2π] rad for rotational joints, mm for linear).
   auto set_relative_position(std::uint8_t device_id, float relative_position) const -> void;
@@ -81,15 +114,26 @@ public:
   auto set_current_limits(std::uint8_t device_id, float min_current, float max_current) const -> void;
 
   /// Request a packet from the specified device.
-  auto request(PacketId packet_id, std::uint8_t device_id) const -> void;
-
-  /// Request up to 10 packets from the specified device.
-  auto request(const std::vector<PacketId> & packet_ids, std::uint8_t device_id) const -> void;
+  ///
+  /// This should be used for one-time, low-frequency requests
+  auto request(PacketId packet_id, std::uint8_t device_id) -> std::future<Packet>;
 
   /// Request a packet from the specified device at some rate.
+  ///
+  /// This can be used to request state information from the device at a fixed rate. When using this function,
+  /// a callback should be added to process the incoming responses.
+  ///
+  /// Exercise caution when using this function in conjunction with the `request` function. If the same packets are
+  /// requested, the driver will send the packet to both the callback and as a future response.
   auto request_at_rate(PacketId packet_id, std::uint8_t device_id, std::chrono::milliseconds rate) const -> void;
 
   /// Request up to 10 packets from the specified device at some rate.
+  ///
+  /// This can be used to request state information from the device at a fixed rate. When using this function,
+  /// a callback should be added to process the incoming responses.
+  ///
+  /// Exercise caution when using this function in conjunction with the `request` function. If the same packets are
+  /// requested, the driver will send the packet to both the callback and as a future response.
   auto request_at_rate(const std::vector<PacketId> & packet_ids, std::uint8_t device_id, std::chrono::milliseconds rate)
     const -> void;
 
@@ -142,7 +186,10 @@ private:
   std::condition_variable packets_cv_;
   std::vector<std::thread> packet_threads_;
 
-  // Requests are managed by a scheduler to ensure that they are sent at the correct rate.
+  // Requests sent using the promise-future pattern.
+  std::unordered_map<PacketId, std::deque<std::promise<Packet>>> pending_requests_;
+
+  // request_at_rate is managed by a scheduler to ensure that requests are sent at the correct rate.
   mutable std::vector<Request> requests_;
   mutable std::mutex request_lock_;
   mutable std::condition_variable request_cv_;

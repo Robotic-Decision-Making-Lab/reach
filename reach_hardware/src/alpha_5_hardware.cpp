@@ -236,7 +236,7 @@ auto Alpha5Hardware::perform_command_mode_switch(
   const std::vector<std::string> & /* stop_interfaces */) -> hardware_interface::return_type
 {
   // Stop all joints
-  alpha_->set_velocity(static_cast<std::uint8_t>(libreach::Alpha5DeviceId::ALL_JOINTS), 0.0);
+  alpha_->set_joint_velocity(static_cast<std::uint8_t>(libreach::Alpha5DeviceId::ALL_JOINTS), 0.0);
 
   // Perform the mode switch
   for (const auto & joint : info_.joints) {
@@ -295,11 +295,11 @@ auto Alpha5Hardware::write(const rclcpp::Time & /* time */, const rclcpp::Durati
     switch (control_modes_.at(desc.prefix_name)) {
       case libreach::Mode::POSITION:
         position = id_cast == libreach::Alpha5DeviceId::JOINT_A ? command * 1000.0 : command;
-        alpha_->set_position(id, static_cast<float>(position));
+        alpha_->set_joint_position(id, static_cast<float>(position));
         break;
       case libreach::Mode::VELOCITY:
         velocity = id_cast == libreach::Alpha5DeviceId::JOINT_A ? command * 1000.0 : command;
-        alpha_->set_velocity(id, static_cast<float>(velocity));
+        alpha_->set_joint_velocity(id, static_cast<float>(velocity));
         break;
       case libreach::Mode::CURRENT:
         current = convert_torque_to_current(command, TORQUE_CONSTANTS[id], GEAR_RATIO[id]);

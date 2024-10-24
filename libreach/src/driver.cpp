@@ -28,6 +28,7 @@
 #include <iostream>
 #include <ranges>
 #include <stdexcept>
+#include <utility>
 
 namespace libreach
 {
@@ -50,6 +51,17 @@ auto inline merge_bytes(const std::vector<std::uint8_t> & first, const std::vect
 
   std::ranges::copy(first, std::back_inserter(bytes));
   std::ranges::copy(second, std::back_inserter(bytes));
+
+  return bytes;
+}
+
+auto inline merge_bytes(const std::vector<std::vector<std::uint8_t>> & byte_vectors) -> std::vector<std::uint8_t>
+{
+  std::vector<std::uint8_t> bytes;
+
+  for (const auto & byte_vector : byte_vectors) {
+    std::ranges::copy(byte_vector, std::back_inserter(bytes));
+  }
 
   return bytes;
 }
@@ -97,17 +109,96 @@ ReachDriver::~ReachDriver()
 
 auto ReachDriver::set_mode(std::uint8_t device_id, Mode mode) const -> void
 {
-  send_packet(PacketId::MODE, device_id, {static_cast<uint8_t>(mode)});
+  send_packet(PacketId::MODE, device_id, {std::to_underlying(mode)});
 }
 
-auto ReachDriver::set_velocity(std::uint8_t device_id, float velocity) const -> void
+auto ReachDriver::set_joint_velocity(std::uint8_t device_id, float velocity) const -> void
 {
   send_packet(PacketId::VELOCITY, device_id, convert_to_bytes<float>(velocity));
 }
 
-auto ReachDriver::set_position(std::uint8_t device_id, float position) const -> void
+auto ReachDriver::set_joint_position(std::uint8_t device_id, float position) const -> void
 {
   send_packet(PacketId::POSITION, device_id, convert_to_bytes<float>(position));
+}
+
+auto ReachDriver::set_ee_pose(std::uint8_t device_id, float x, float y, float z, float rz, float ry, float rx) const
+  -> void
+{
+  send_packet(
+    PacketId::KM_END_POS,
+    device_id,
+    merge_bytes(
+      {convert_to_bytes<float>(x),
+       convert_to_bytes<float>(y),
+       convert_to_bytes<float>(z),
+       convert_to_bytes<float>(rz),
+       convert_to_bytes<float>(ry),
+       convert_to_bytes<float>(rx)}));
+}
+
+auto ReachDriver::set_ee_pose(std::uint8_t device_id, float x, float y, float z) const -> void
+{
+  send_packet(
+    PacketId::KM_END_POS,
+    device_id,
+    merge_bytes(
+      {convert_to_bytes<float>(x),
+       convert_to_bytes<float>(y),
+       convert_to_bytes<float>(z),
+       convert_to_bytes<float>(0.0F),
+       convert_to_bytes<float>(0.0F),
+       convert_to_bytes<float>(0.0F)}));
+}
+
+auto ReachDriver::set_ee_velocity(std::uint8_t device_id, float vx, float vy, float vz, float vrz, float vry, float vrx)
+  const -> void
+{
+  send_packet(
+    PacketId::KM_END_VEL,
+    device_id,
+    merge_bytes(
+      {convert_to_bytes<float>(vx),
+       convert_to_bytes<float>(vy),
+       convert_to_bytes<float>(vz),
+       convert_to_bytes<float>(vrz),
+       convert_to_bytes<float>(vry),
+       convert_to_bytes<float>(vrx)}));
+}
+
+auto ReachDriver::set_ee_velocity(std::uint8_t device_id, float vx, float vy, float vz) const -> void
+{
+  send_packet(
+    PacketId::KM_END_VEL,
+    device_id,
+    merge_bytes(
+      {convert_to_bytes<float>(vx),
+       convert_to_bytes<float>(vy),
+       convert_to_bytes<float>(vz),
+       convert_to_bytes<float>(0.0F),
+       convert_to_bytes<float>(0.0F),
+       convert_to_bytes<float>(0.0F)}));
+}
+
+auto ReachDriver::set_local_ee_velocity(
+  std::uint8_t device_id,
+  float vx,
+  float vy,
+  float vz,
+  float vrz,
+  float vry,
+  float vrx) const -> void
+{
+  send_packet(
+    PacketId::KM_END_VEL_LOCAL,
+    device_id,
+    merge_bytes(
+      {convert_to_bytes<float>(vx),
+       convert_to_bytes<float>(vy),
+       convert_to_bytes<float>(vz),
+       convert_to_bytes<float>(vrz),
+       convert_to_bytes<float>(vry),
+       convert_to_bytes<float>(vrx)}));
 }
 
 auto ReachDriver::set_relative_position(std::uint8_t device_id, float relative_position) const -> void
@@ -138,28 +229,15 @@ auto ReachDriver::set_current_limits(std::uint8_t device_id, float min_current, 
   send_packet(PacketId::CURRENT_LIMITS, device_id, range);
 }
 
-auto ReachDriver::request(PacketId packet_id, std::uint8_t device_id) const -> void
+auto ReachDriver::request(PacketId packet_id, std::uint8_t device_id) -> std::future<Packet>
 {
-  send_packet(PacketId::REQUEST, device_id, {static_cast<std::uint8_t>(packet_id)});
-}
+  std::promise<Packet> response;
+  auto future = response.get_future();
 
-auto ReachDriver::request(const std::vector<PacketId> & packet_ids, std::uint8_t device_id) const -> void
-{
-  if (packet_ids.empty()) {
-    throw std::invalid_argument("Cannot request packets with an empty list of packet IDs.");
-  }
+  pending_requests_[packet_id].emplace_back(std::move(response));
+  send_packet(PacketId::REQUEST, device_id, {std::to_underlying(packet_id)});
 
-  if (packet_ids.size() > 10) {
-    throw std::invalid_argument("Cannot request more than 10 packets at a time.");
-  }
-
-  std::vector<std::uint8_t> request_types(packet_ids.size());
-
-  for (auto id : packet_ids) {
-    request_types.push_back(static_cast<std::uint8_t>(id));
-  }
-
-  send_packet(PacketId::REQUEST, device_id, request_types);
+  return future;
 }
 
 auto ReachDriver::request_at_rate(PacketId packet_id, std::uint8_t device_id, std::chrono::milliseconds rate) const
@@ -167,7 +245,7 @@ auto ReachDriver::request_at_rate(PacketId packet_id, std::uint8_t device_id, st
 {
   {
     const std::lock_guard<std::mutex> lock(request_lock_);
-    auto packet = Packet(PacketId::REQUEST, device_id, {static_cast<std::uint8_t>(packet_id)});
+    auto packet = Packet(PacketId::REQUEST, device_id, {std::to_underlying(packet_id)});
     requests_.emplace_back(packet, rate);
   }
   request_cv_.notify_all();
@@ -192,7 +270,7 @@ auto ReachDriver::request_at_rate(
     std::vector<std::uint8_t> request_types(packet_ids.size());
 
     for (auto id : packet_ids) {
-      request_types.push_back(static_cast<std::uint8_t>(id));
+      request_types.push_back(std::to_underlying(id));
     }
 
     auto packet = Packet(PacketId::REQUEST, device_id, request_types);
@@ -254,12 +332,18 @@ auto ReachDriver::process_packet() -> void
 
   lock.unlock();
 
+  // Execute the callbacks for the packet
   auto it = callbacks_.find(packet.packet_id());
-
   if (it != callbacks_.end()) {
     for (const auto & callback : it->second) {
       callback(packet);
     }
+  }
+
+  // Resolve any pending requests
+  if (pending_requests_.contains(packet.packet_id()) && !pending_requests_.at(packet.packet_id()).empty()) {
+    pending_requests_[packet.packet_id()].front().set_value(packet);
+    pending_requests_[packet.packet_id()].pop_front();
   }
 }
 

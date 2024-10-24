@@ -44,7 +44,7 @@ target_sources(
             ${CMAKE_CURRENT_SOURCE_DIR}/include/libreach/udp_driver.hpp
 )
 
-target_compile_features(libreach PUBLIC cxx_std_20)
+target_compile_features(libreach PUBLIC cxx_std_23)
 target_link_libraries(libreach PUBLIC Boost::boost PRIVATE Boost::system)
 set_target_properties(libreach PROPERTIES PREFIX "")
 

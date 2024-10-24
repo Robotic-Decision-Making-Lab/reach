@@ -27,6 +27,7 @@
 
 #include <algorithm>
 #include <iostream>
+#include <ranges>
 #include <stdexcept>
 
 #include "cobs.hpp"
@@ -59,7 +60,7 @@ auto Packet::pop_front(std::size_t bytes) -> std::vector<std::uint8_t>
     throw std::invalid_argument("Cannot pop more bytes than are available in the packet.");
   }
 
-  std::vector<std::uint8_t> popped(data_.begin(), data_.begin() + bytes);
+  auto popped = data_ | std::views::take(bytes) | std::ranges::to<std::vector>();
   data_.erase(data_.begin(), data_.begin() + bytes);
 
   return popped;
@@ -71,7 +72,7 @@ auto Packet::pop_back(std::size_t bytes) -> std::vector<std::uint8_t>
     throw std::invalid_argument("Cannot pop more bytes than are available in the packet.");
   }
 
-  std::vector<std::uint8_t> popped(data_.end() - bytes, data_.end());
+  auto popped = data_ | std::views::drop(data_.size() - bytes) | std::ranges::to<std::vector>();
   data_.erase(data_.end() - bytes, data_.end());
 
   return popped;

@@ -38,7 +38,8 @@
         "esbenp.prettier-vscode",
         "xaver.clang-format",
         "charliermarsh.ruff",
-        "ms-vscode.cmake-tools"
+        "ms-vscode.cmake-tools",
+        "tomoki1207.pdf"
       ]
     }
   }

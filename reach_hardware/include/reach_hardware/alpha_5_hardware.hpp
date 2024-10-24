@@ -88,6 +88,8 @@ private:
   std::unordered_map<std::uint8_t, std::string> device_ids_to_names_;
   std::unordered_map<std::string, std::uint8_t> names_to_device_ids_;
 
+  // TODO(evan-palmer): Add a node to handle service requests for configuring safety limits and other parameters
+
   // Device operating modes
   std::unordered_map<std::string, libreach::Mode> control_modes_;
 
