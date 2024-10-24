@@ -41,10 +41,10 @@ namespace
 // dynamics/kinematics datasheet.
 
 // Kt, provided in the order of the Device IDs (V_pk / (rad/s))
-const std::array<float, 7> TORQUE_CONSTANTS{0.209, 0.209, 0.215, 0.215, 0.215, 0.222, 0.222};
+const std::array<float, 5> TORQUE_CONSTANTS{0.209, 0.209, 0.215, 0.215, 0.215};
 
 // Gr, provided in the order of the Device IDs
-const std::array<float, 7> GEAR_RATIO{39.27, 120.0, 120.0, 120.0, 120.0, 120.0, 120.0};
+const std::array<float, 5> GEAR_RATIO{39.27, 120.0, 120.0, 120.0, 120.0};
 
 // Command interfaces supported by the Alpha5Hardware system
 const std::vector<std::string> COMMAND_INTERFACES{
@@ -102,6 +102,9 @@ auto Alpha5Hardware::on_init(const hardware_interface::HardwareInfo & info) -> h
 
   for (const auto & joint : info_.joints) {
     const auto device_id = static_cast<std::uint8_t>(std::stoi(joint.parameters.at("device_id")));
+
+    // Instead of depending on the order/names of the joints in the URDF, we use the device ID to map the joint names
+    // This ensures that we can handle any joint order/naming in the URDF
     device_ids_to_names_[device_id] = joint.name;
     names_to_device_ids_[joint.name] = device_id;
 
@@ -287,19 +290,20 @@ auto Alpha5Hardware::write(const rclcpp::Time & /* time */, const rclcpp::Durati
     const auto id = names_to_device_ids_.at(desc.prefix_name);
     const auto id_cast = static_cast<libreach::Alpha5DeviceId>(id);
 
+    double position, velocity, current;
+
     switch (control_modes_.at(desc.prefix_name)) {
       case libreach::Mode::POSITION:
-        const double position_d = id_cast == libreach::Alpha5DeviceId::JOINT_A ? command * 1000.0 : command;
-        alpha_->set_position(id, static_cast<float>(position_d));
+        position = id_cast == libreach::Alpha5DeviceId::JOINT_A ? command * 1000.0 : command;
+        alpha_->set_position(id, static_cast<float>(position));
         break;
       case libreach::Mode::VELOCITY:
-        const double velocity_d = id_cast == libreach::Alpha5DeviceId::JOINT_A ? command * 1000.0 : command;
-        alpha_->set_velocity(id, static_cast<float>(velocity_d));
+        velocity = id_cast == libreach::Alpha5DeviceId::JOINT_A ? command * 1000.0 : command;
+        alpha_->set_velocity(id, static_cast<float>(velocity));
         break;
       case libreach::Mode::CURRENT:
-        const auto idx = static_cast<std::size_t>(id) - 1;
-        const auto torque_d = convert_current_to_torque(command, TORQUE_CONSTANTS[idx], GEAR_RATIO[idx]);
-        alpha_->set_current(id, static_cast<float>(torque_d));
+        current = convert_torque_to_current(command, TORQUE_CONSTANTS[id], GEAR_RATIO[id]);
+        alpha_->set_current(id, static_cast<float>(current));
         break;
       default:
         break;

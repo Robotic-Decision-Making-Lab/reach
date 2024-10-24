@@ -4,8 +4,7 @@
       "name": "Linux",
       "includePath": [
         "${workspaceFolder}/**",
-        "/opt/ros/rolling/include/**",
-        "/usr/include/gz/**",
+        "/opt/ros/jazzy/include/**",
         "/home/ubuntu/ws_ros/**"
       ],
       "defines": [],

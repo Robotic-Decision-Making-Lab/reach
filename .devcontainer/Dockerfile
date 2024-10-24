@@ -1,5 +1,5 @@
-ARG ROS_DISTRO=rolling
-FROM ros:$ROS_DISTRO-ros-base as base
+ARG ROS_DISTRO=jazzy
+FROM ros:$ROS_DISTRO-ros-base AS base
 
 ENV DEBIAN_FRONTEND=noninteractive
 WORKDIR /root/ws_ros
@@ -62,9 +62,6 @@ RUN python3 -m venv --system-site-packages $VIRTUAL_ENV \
     && echo "\n# Ensure colcon is run in the venv\nalias colcon='python3 -m colcon'" >> /home/$USERNAME/.bashrc
 ENV PATH="$VIRTUAL_ENV/bin:$PATH"
 
-# Uncomment to download and install external repos used by the project
-# RUN vcs import src < src/$PROJECT_NAME/ros2.repos
-
 # Install all ROS dependencies
 WORKDIR $USER_WORKSPACE
 RUN sudo apt-get -q update \
@@ -76,11 +73,11 @@ RUN sudo apt-get -q update \
     && sudo rm -rf /var/lib/apt/lists/*
 
 RUN . "/opt/ros/${ROS_DISTRO}/setup.sh" \
-    # && colcon build \
-    # && echo "source ${USER_WORKSPACE}/install/setup.bash" >> /home/$USERNAME/.bashrc \
+    && colcon build \
+    && echo "source ${USER_WORKSPACE}/install/setup.bash" >> /home/$USERNAME/.bashrc \
     && echo "if [ -f /opt/ros/${ROS_DISTRO}/setup.bash ]; then source /opt/ros/${ROS_DISTRO}/setup.bash; fi" >> /home/$USERNAME/.bashrc
 
-FROM base as desktop
+FROM base AS desktop
 
 ENV DEBIAN_FRONTEND=noninteractive
 ENV USER_WORKSPACE=/home/$USERNAME/ws_ros
@@ -111,7 +108,7 @@ RUN sudo apt-get -q update \
     && sudo apt-get clean -y \
     && sudo rm -rf /var/lib/apt/lists/*
 
-FROM desktop as desktop-nvidia
+FROM desktop AS desktop-nvidia
 
 # Install NVIDIA software
 RUN sudo apt-get update \

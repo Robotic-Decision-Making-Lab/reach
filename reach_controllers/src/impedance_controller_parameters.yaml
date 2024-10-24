@@ -39,4 +39,3 @@ impedance_controller:
         default_value: 0.0
         description: "Joint damping (Nm*s/rad)"
         read_only: false
-
