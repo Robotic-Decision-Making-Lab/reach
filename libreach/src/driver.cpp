@@ -229,6 +229,60 @@ auto ReachDriver::set_current_limits(std::uint8_t device_id, float min_current, 
   send_packet(PacketId::CURRENT_LIMITS, device_id, range);
 }
 
+auto ReachDriver::capture_preset_position(std::uint8_t device_id, std::uint8_t preset_id) const -> void
+{
+  send_packet(PacketId::POSITION_PRESET_CAPTURE, device_id, {preset_id});
+}
+
+auto ReachDriver::go_to_preset_position(std::uint8_t device_id, std::uint8_t preset_id) const -> void
+{
+  send_packet(PacketId::POSITION_PRESET_GO, device_id, {preset_id});
+}
+
+auto ReachDriver::set_preset_position(
+  std::uint8_t device_id,
+  std::uint8_t preset_id,
+  float A,
+  float B,
+  float C,
+  float D,
+  float E,
+  float F,
+  float G,
+  float H) const -> void
+{
+  const auto id = std::to_underlying(PacketId::POSITION_PRESET_SET_01) + preset_id;
+  send_packet(
+    static_cast<PacketId>(id),
+    device_id,
+    merge_bytes(
+      {convert_to_bytes<float>(A),
+       convert_to_bytes<float>(B),
+       convert_to_bytes<float>(C),
+       convert_to_bytes<float>(D),
+       convert_to_bytes<float>(E),
+       convert_to_bytes<float>(F),
+       convert_to_bytes<float>(G),
+       convert_to_bytes<float>(H)}));
+}
+
+auto ReachDriver::name_position_preset(std::uint8_t device_id, std::uint8_t preset_id, const std::string & name) const
+  -> void
+{
+  // Get the first 8 bytes of the name
+  std::vector<std::uint8_t> name_bytes(name.begin(), name.begin() + std::min(name.size(), static_cast<std::size_t>(8)));
+
+  // Add padding if the name is less than 8 bytes
+  if (name_bytes.size() < 8) {
+    name_bytes.resize(8, 0x00);
+  }
+
+  const auto id = std::to_underlying(PacketId::POSITION_PRESET_NAME_01) + preset_id;
+  send_packet(static_cast<PacketId>(id), device_id, name_bytes);
+}
+
+auto ReachDriver::save(std::uint8_t device_id) const -> void { send_packet(PacketId::SAVE, device_id, {0x00}); }
+
 auto ReachDriver::request(PacketId packet_id, std::uint8_t device_id) -> std::future<Packet>
 {
   std::promise<Packet> response;

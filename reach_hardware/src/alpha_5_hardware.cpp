@@ -141,6 +141,8 @@ auto Alpha5Hardware::on_init(const hardware_interface::HardwareInfo & info) -> h
 
   RCLCPP_INFO(logger_, "Successfully initialized Alpha5Hardware system interface");  // NOLINT
 
+  // TODO(evan-palmer): configure end effector sensor interfaces
+
   return hardware_interface::CallbackReturn::SUCCESS;
 }
 
@@ -236,7 +238,7 @@ auto Alpha5Hardware::perform_command_mode_switch(
   const std::vector<std::string> & /* stop_interfaces */) -> hardware_interface::return_type
 {
   // Stop all joints
-  alpha_->set_joint_velocity(static_cast<std::uint8_t>(libreach::Alpha5DeviceId::ALL_JOINTS), 0.0);
+  alpha_->set_joint_velocity(std::to_underlying(libreach::Alpha5DeviceId::ALL_JOINTS), 0.0);
 
   // Perform the mode switch
   for (const auto & joint : info_.joints) {
@@ -249,14 +251,14 @@ auto Alpha5Hardware::perform_command_mode_switch(
 auto Alpha5Hardware::on_activate(const rclcpp_lifecycle::State & /* previous_state */)
   -> hardware_interface::CallbackReturn
 {
-  alpha_->set_mode(static_cast<std::uint8_t>(libreach::Alpha5DeviceId::ALL_JOINTS), libreach::Mode::STANDBY);
+  alpha_->set_mode(std::to_underlying(libreach::Alpha5DeviceId::ALL_JOINTS), libreach::Mode::STANDBY);
   return hardware_interface::CallbackReturn::SUCCESS;
 }
 
 auto Alpha5Hardware::on_deactivate(const rclcpp_lifecycle::State & /* previous_state */)
   -> hardware_interface::CallbackReturn
 {
-  alpha_->set_mode(static_cast<std::uint8_t>(libreach::Alpha5DeviceId::ALL_JOINTS), libreach::Mode::DISABLE);
+  alpha_->set_mode(std::to_underlying(libreach::Alpha5DeviceId::ALL_JOINTS), libreach::Mode::DISABLE);
   return hardware_interface::CallbackReturn::SUCCESS;
 }
 
@@ -274,6 +276,8 @@ auto Alpha5Hardware::read(const rclcpp::Time & /* time */, const rclcpp::Duratio
       set_state(name, async_states_efforts_[desc.prefix_name]);
     }
   }
+
+  // TODO(evan-palmer): read the end effector state
 
   return hardware_interface::return_type::OK;
 }

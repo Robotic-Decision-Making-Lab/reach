@@ -113,6 +113,50 @@ public:
   /// Set the minimum and maximum current of a joint (mAh).
   auto set_current_limits(std::uint8_t device_id, float min_current, float max_current) const -> void;
 
+  /// Move to a preset position.
+  ///
+  /// This needs to be called at a rate of >10 Hz to continue driving to the preset position.
+  ///
+  /// The device ID should be set to the manipulator base.
+  auto go_to_preset_position(std::uint8_t device_id, std::uint8_t preset_id) const -> void;
+
+  /// Save the current position as a position preset for the provided preset index.
+  ///
+  /// There are 4 allocations for position presets given by index [0:3]
+  ///
+  /// The device ID should be set to the manipulator base.
+  auto capture_preset_position(std::uint8_t device_id, std::uint8_t preset_id) const -> void;
+
+  /// Set the specified preset position angles given the preset id [0:3] (rad for rotational joints, mm for linear
+  /// joints).
+  ///
+  /// Unused positions should be set to 0.
+  ///
+  /// The device ID should be set to the manipulator base.
+  auto set_preset_position(
+    std::uint8_t device_id,
+    std::uint8_t preset_id,
+    float A,
+    float B,
+    float C,
+    float D,
+    float E,
+    float F,
+    float G,
+    float H) const -> void;
+
+  /// Set the name of the specified preset position given the preset ID [0:3].
+  ///
+  /// The name should be no larger than 8 bytes - anything larger will be truncated.
+  ///
+  /// The device ID should be set to the manipulator base.
+  auto name_position_preset(std::uint8_t device_id, std::uint8_t preset_id, const std::string & name) const -> void;
+
+  /// Save the current configuration to the device.
+  ///
+  /// This should be sent individually to each joint.
+  auto save(std::uint8_t device_id) const -> void;
+
   /// Request a packet from the specified device.
   ///
   /// This should be used for one-time, low-frequency requests

@@ -1,0 +1,118 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+  <xacro:macro name="alpha_system"
+               params="prefix serial_port state_update_frequency">
+
+    <xacro:property name="initial_positions"
+                    value="${xacro.load_yaml('$(find alpha_description)/config/$(arg initial_positions_file)')['initial_positions']}" />
+
+    <ros2_control name="ReachAlpha5System"
+                  type="system">
+
+      <hardware>
+        <plugin>alpha_hardware/AlphaHardware</plugin>
+        <param name="serial_port">${serial_port}</param>
+        <param name="state_update_frequency">${state_update_frequency}</param>
+      </hardware>
+
+      <joint name="${prefix}axis_a">
+        <command_interface name="position">
+          <param name="min">0</param>
+          <param name="max">0.015</param>
+        </command_interface>
+        <command_interface name="velocity">
+          <param name="min">-2.5</param>
+          <param name="max">2.5</param>
+        </command_interface>
+        <state_interface name="position">
+          <param name="initial_value">${initial_positions['axis_a']}</param>
+        </state_interface>
+        <state_interface name="velocity">
+          <param name="initial_value">0.0</param>
+        </state_interface>
+      </joint>
+
+      <joint name="${prefix}axis_b">
+        <command_interface name="position">
+          <param name="min">0</param>
+          <param name="max">3.22</param>
+        </command_interface>
+        <command_interface name="velocity">
+          <param name="min">-1.0</param>
+          <param name="max">1.0</param>
+        </command_interface>
+        <state_interface name="position">
+          <param name="initial_value">${initial_positions['axis_b']}</param>
+        </state_interface>
+        <state_interface name="velocity">
+          <param name="initial_value">0.0</param>
+        </state_interface>
+      </joint>
+
+      <joint name="${prefix}axis_c">
+        <command_interface name="position">
+          <param name="min">0</param>
+          <param name="max">3.22</param>
+        </command_interface>
+        <command_interface name="velocity">
+          <param name="min">-1.0</param>
+          <param name="max">1.0</param>
+        </command_interface>
+        <state_interface name="position">
+          <param name="initial_value">${initial_positions['axis_c']}</param>
+        </state_interface>
+        <state_interface name="velocity">
+          <param name="initial_value">0.0</param>
+        </state_interface>
+      </joint>
+
+      <joint name="${prefix}axis_d">
+        <command_interface name="position">
+          <param name="min">0</param>
+          <param name="max">3.49</param>
+        </command_interface>
+        <command_interface name="velocity">
+          <param name="min">-1.0</param>
+          <param name="max">1.0</param>
+        </command_interface>
+        <state_interface name="position">
+          <param name="initial_value">${initial_positions['axis_d']}</param>
+        </state_interface>
+        <state_interface name="velocity">
+          <param name="initial_value">0.0</param>
+        </state_interface>
+      </joint>
+
+      <joint name="${prefix}axis_e">
+        <command_interface name="position">
+          <param name="min">0</param>
+          <param name="max">6.10</param>
+        </command_interface>
+        <command_interface name="velocity">
+          <param name="min">-0.5</param>
+          <param name="max">0.5</param>
+        </command_interface>
+        <state_interface name="position">
+          <param name="initial_value">${initial_positions['axis_e']}</param>
+        </state_interface>
+        <state_interface name="velocity">
+          <param name="initial_value">0.0</param>
+        </state_interface>
+      </joint>
+
+      <sensor name="${prefix}tcp_pose">
+        <state_interface name="position.x" />
+        <state_interface name="position.y" />
+        <state_interface name="position.z" />
+        <state_interface name="orientation.x" />
+        <state_interface name="orientation.y" />
+        <state_interface name="orientation.z" />
+        <state_interface name="orientation.w" />
+      </sensor>
+
+    </ros2_control>
+
+  </xacro:macro>
+
+</robot>

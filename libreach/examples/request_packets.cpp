@@ -49,28 +49,39 @@ auto main() -> int
     std::cout << "Received CURRENT packet with value: " << libreach::deserialize<float>(packet) << "\n";
   });
 
-  driver.register_callback(libreach::PacketId::KM_END_POS, [](const libreach::Packet & packet) {
-    const auto pose = libreach::deserialize<std::vector<float>>(packet);
-    std::cout << "Received KM_END_POS packet. End effector position is: \n\r x: " << pose[0] << "\n\r y: " << pose[1]
-              << "\n\r z: " << pose[2] << "\n";
-  });
+  // The `request_at_rate` interface is designed to facilitate asynchronous periodic requests for data. This is
+  // especially useful in scenarios where we want to monitor the state of the robot in real-time without needing to
+  // manually request that data on our own.
 
   // Request a POSITION packet from joint A at a rate of 10 Hz (every 100 ms)
   driver.request_at_rate(
     libreach::PacketId::POSITION,
-    static_cast<std::uint8_t>(libreach::Alpha5DeviceId::JOINT_A),
+    std::to_underlying(libreach::Alpha5DeviceId::JOINT_A),
     std::chrono::milliseconds(100));
 
   // Request VELOCITY and CURRENT packets from joint B at a rate of 5 Hz (every 200 ms)
   driver.request_at_rate(
     {libreach::PacketId::VELOCITY, libreach::PacketId::CURRENT},
-    static_cast<std::uint8_t>(libreach::Alpha5DeviceId::JOINT_B),
+    std::to_underlying(libreach::Alpha5DeviceId::JOINT_B),
     std::chrono::milliseconds(200));
 
-  while (true) {
-    // Send a one-time request for the RELATIVE_POSITION packet from joint C
-    driver.request(libreach::PacketId::KM_END_POS, static_cast<std::uint8_t>(libreach::Alpha5DeviceId::BASE));
+  // The `request` interface is designed for one-time requests for data (e.g., for current configurations) and can be
+  // used either synchronously or asynchronously.
 
+  // Send a one-time request for the end effector pose
+  std::future<libreach::Packet> f =
+    driver.request(libreach::PacketId::KM_END_POS, std::to_underlying(libreach::Alpha5DeviceId::BASE));
+
+  // Wait for the response - we could also wait for this asynchronously by spinning up a new thread
+  const libreach::Packet packet = f.get();
+
+  // Convert the packet data to a vector of floats
+  const auto pose = libreach::deserialize<std::vector<float>>(packet);
+
+  std::cout << "Received KM_END_POS packet. End effector position is: \n\r x: " << pose[0] << "\n\r y: " << pose[1]
+            << "\n\r z: " << pose[2] << "\n";
+
+  while (true) {
     std::this_thread::sleep_for(std::chrono::seconds(1));
   }
 

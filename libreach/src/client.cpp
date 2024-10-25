@@ -29,6 +29,7 @@
 #include <ranges>
 #include <sstream>
 #include <string>
+#include <utility>
 
 #include "libreach/packet_id.hpp"
 
@@ -86,7 +87,7 @@ auto Client::send_packet(const Packet & packet) const -> void
 auto Client::enable_heartbeat(std::uint8_t frequency) const -> void
 {
   // Request the software version as the heartbeat because there isn't an official heartbeat message
-  send_packet(Packet(PacketId::HEARTBEAT_SET, 0xFF, {static_cast<std::uint8_t>(PacketId::SOFTWARE_VERSION)}));
+  send_packet(Packet(PacketId::HEARTBEAT_SET, 0xFF, {std::to_underlying(PacketId::SOFTWARE_VERSION)}));
   set_heartbeat_rate(frequency);
 }
 

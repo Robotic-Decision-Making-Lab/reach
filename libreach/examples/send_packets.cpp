@@ -41,20 +41,20 @@ auto main() -> int
   const libreach::SerialDriver driver(serial_port);
 
   // Set the desired position for joint E (rad)
-  const auto joint_a = static_cast<std::uint8_t>(libreach::Alpha5DeviceId::JOINT_E);
+  const auto joint_e = std::to_underlying(libreach::Alpha5DeviceId::JOINT_E);
 
   // 1. Helper functions have been provided to execute a variety of command commands such as setting the position
   const float desired_position = 0.53;
-  driver.set_joint_position(joint_a, desired_position);
+  driver.set_joint_position(joint_e, desired_position);
 
   // 2. If a helper function does not exist for a specific command, packets can be sent directly to the robot
   std::vector<std::uint8_t> bytes(sizeof(desired_position));
   std::memcpy(bytes.data(), &desired_position, sizeof(desired_position));
 
-  driver.send_packet(libreach::PacketId::POSITION, joint_a, bytes);
+  driver.send_packet(libreach::PacketId::POSITION, joint_e, bytes);
 
   // 3. Packets can also be constructed and sent manually
-  auto packet = libreach::Packet(libreach::PacketId::POSITION, joint_a, bytes);
+  auto packet = libreach::Packet(libreach::PacketId::POSITION, joint_e, bytes);
   driver.send_packet(packet);
 
   // Let the driver run indefinitely

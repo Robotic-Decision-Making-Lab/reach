@@ -29,6 +29,7 @@
 #include <iostream>
 #include <ranges>
 #include <stdexcept>
+#include <utility>
 
 #include "cobs.hpp"
 #include "crc.hpp"
@@ -60,10 +61,10 @@ auto Packet::pop_front(std::size_t bytes) -> std::vector<std::uint8_t>
     throw std::invalid_argument("Cannot pop more bytes than are available in the packet.");
   }
 
-  auto popped = data_ | std::views::take(bytes) | std::ranges::to<std::vector>();
+  auto popped = data_ | std::views::take(bytes);
   data_.erase(data_.begin(), data_.begin() + bytes);
 
-  return popped;
+  return {popped.begin(), popped.end()};
 }
 
 auto Packet::pop_back(std::size_t bytes) -> std::vector<std::uint8_t>
@@ -72,10 +73,10 @@ auto Packet::pop_back(std::size_t bytes) -> std::vector<std::uint8_t>
     throw std::invalid_argument("Cannot pop more bytes than are available in the packet.");
   }
 
-  auto popped = data_ | std::views::drop(data_.size() - bytes) | std::ranges::to<std::vector>();
+  auto popped = data_ | std::views::drop(data_.size() - bytes);
   data_.erase(data_.end() - bytes, data_.end());
 
-  return popped;
+  return {popped.begin(), popped.end()};
 }
 
 namespace protocol
@@ -85,8 +86,8 @@ auto encode_packet(const Packet & packet) -> std::vector<std::uint8_t>
 {
   std::vector<std::uint8_t> data(packet.data());
 
-  data.push_back(static_cast<std::uint8_t>(packet.packet_id()));
-  data.push_back(static_cast<std::uint8_t>(packet.device_id()));
+  data.push_back(std::to_underlying(packet.packet_id()));
+  data.push_back(packet.device_id());
 
   // Length is the current buffer size plus two (length and CRC)
   data.push_back(data.size() + 2);
