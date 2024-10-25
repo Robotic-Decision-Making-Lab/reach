@@ -41,10 +41,10 @@ namespace
 // dynamics/kinematics datasheet.
 
 // Kt, provided in the order of the Device IDs (V_pk / (rad/s))
-const std::array<float, 5> TORQUE_CONSTANTS{0.209, 0.209, 0.215, 0.215, 0.215};
+const std::array<float, 5> TORQUE_CONSTANTS{0.0271, 0.0271, 0.0134, 0.0134, 0.0134};
 
 // Gr, provided in the order of the Device IDs
-const std::array<float, 5> GEAR_RATIO{39.27, 120.0, 120.0, 120.0, 120.0};
+const std::array<float, 5> GEAR_RATIO{348.7, 340.4, 1754.4, 1754.4, 1754.4};
 
 // Command interfaces supported by the Alpha5Hardware system
 const std::vector<std::string> COMMAND_INTERFACES{
@@ -101,10 +101,9 @@ auto Alpha5Hardware::on_init(const hardware_interface::HardwareInfo & info) -> h
   }
 
   for (const auto & joint : info_.joints) {
+    // Create a lookup table for the device IDs. This prevents us from needing to search for the device ID each time we
+    // want to send a command or request state information.
     const auto device_id = static_cast<std::uint8_t>(std::stoi(joint.parameters.at("device_id")));
-
-    // Instead of depending on the order/names of the joints in the URDF, we use the device ID to map the joint names
-    // This ensures that we can handle any joint order/naming in the URDF
     device_ids_to_names_[device_id] = joint.name;
     names_to_device_ids_[joint.name] = device_id;
 
@@ -135,13 +134,9 @@ auto Alpha5Hardware::on_init(const hardware_interface::HardwareInfo & info) -> h
     }
   }
 
-  // Load the ROS params
   serial_port_ = info_.hardware_parameters.at("serial_port");
-  state_request_rate_ = std::chrono::milliseconds(std::stoi(info_.hardware_parameters.at("state_request_rate")));
 
   RCLCPP_INFO(logger_, "Successfully initialized Alpha5Hardware system interface");  // NOLINT
-
-  // TODO(evan-palmer): configure end effector sensor interfaces
 
   return hardware_interface::CallbackReturn::SUCCESS;
 }
@@ -167,6 +162,23 @@ auto Alpha5Hardware::on_configure(const rclcpp_lifecycle::State & /* previous_st
   catch (const std::exception & e) {
     RCLCPP_ERROR(logger_, "Failed to configure serial driver: %s", e.what());  // NOLINT
     return hardware_interface::CallbackReturn::ERROR;
+  }
+
+  // Set the joint limits according to the values specified in the URDF
+  for (const auto & joint : info_.joints) {
+    for (const auto & interface : joint.command_interfaces) {
+      if (interface.name == hardware_interface::HW_IF_POSITION) {
+        alpha_->set_position_limits(
+          names_to_device_ids_[joint.name], std::stof(interface.min), std::stof(interface.max));
+      } else if (interface.name == hardware_interface::HW_IF_VELOCITY) {
+        // TODO(evan-palmer): convert the velocity limits to the appropriate units
+        alpha_->set_velocity_limits(
+          names_to_device_ids_[joint.name], std::stof(interface.min), std::stof(interface.max));
+      } else if (interface.name == hardware_interface::HW_IF_EFFORT) {
+        alpha_->set_current_limits(
+          names_to_device_ids_[joint.name], std::stof(interface.min), std::stof(interface.max));
+      }
+    }
   }
 
   // Register the state callbacks
@@ -200,7 +212,7 @@ auto Alpha5Hardware::on_configure(const rclcpp_lifecycle::State & /* previous_st
     alpha_->request_at_rate(
       {libreach::PacketId::POSITION, libreach::PacketId::VELOCITY, libreach::PacketId::CURRENT},
       names_to_device_ids_.at(joint.name),
-      state_request_rate_);
+      std::chrono::milliseconds(10));  // 100 Hz
   }
 
   RCLCPP_INFO(logger_, "Successfully configured the Alpha5Hardware system interface");  // NOLINT
@@ -237,10 +249,8 @@ auto Alpha5Hardware::perform_command_mode_switch(
   const std::vector<std::string> & /* start_interfaces */,
   const std::vector<std::string> & /* stop_interfaces */) -> hardware_interface::return_type
 {
-  // Stop all joints
   alpha_->set_joint_velocity(std::to_underlying(libreach::Alpha5DeviceId::ALL_JOINTS), 0.0);
 
-  // Perform the mode switch
   for (const auto & joint : info_.joints) {
     alpha_->set_mode(names_to_device_ids_[joint.name], control_modes_[joint.name]);
   }
@@ -277,8 +287,6 @@ auto Alpha5Hardware::read(const rclcpp::Time & /* time */, const rclcpp::Duratio
     }
   }
 
-  // TODO(evan-palmer): read the end effector state
-
   return hardware_interface::return_type::OK;
 }
 
@@ -306,7 +314,7 @@ auto Alpha5Hardware::write(const rclcpp::Time & /* time */, const rclcpp::Durati
         alpha_->set_joint_velocity(id, static_cast<float>(velocity));
         break;
       case libreach::Mode::CURRENT:
-        current = convert_torque_to_current(command, TORQUE_CONSTANTS[id], GEAR_RATIO[id]);
+        current = convert_torque_to_current(command, TORQUE_CONSTANTS[id - 1], GEAR_RATIO[id - 1]);
         alpha_->set_current(id, static_cast<float>(current));
         break;
       default:

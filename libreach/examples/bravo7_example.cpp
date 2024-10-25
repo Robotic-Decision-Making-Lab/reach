@@ -49,7 +49,7 @@ auto main() -> int
   // Request POSITION data at 10 Hz from joint A
   driver.request_at_rate(
     libreach::PacketId::POSITION,
-    static_cast<std::uint8_t>(libreach::Bravo7DeviceId::JOINT_A),
+    std::to_underlying(libreach::Bravo7DeviceId::JOINT_A),
     std::chrono::milliseconds(100));
 
   // Let the driver run indefinitely

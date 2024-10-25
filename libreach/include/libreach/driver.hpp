@@ -69,32 +69,48 @@ public:
 
   /// Set the end-effector pose with respect to the base frame (mm for position, rad for rotation).
   ///
-  /// For manipulators with less than 7 degrees of freedom, the orientation configurations are ignored.
-  ///
   /// The device ID should be set to the manipulator base.
+  ///
+  /// INFO: Inverse kinematics is not available for manipulators with less than 5 functions. Orbit controls (YPR) are
+  /// not available for manipulators with less than 7 functions (values will be ignored). Additionally, inverse
+  /// kinematics is disabled for standard manipulator packages.
   auto set_ee_pose(std::uint8_t device_id, float x, float y, float z, float rz, float ry, float rx) const -> void;
 
   /// Set the end-effector position with respect to the base frame (mm).
   ///
   /// The device ID should be set to the manipulator base.
+  ///
+  /// INFO: Inverse kinematics is not available for manipulators with less than 5 functions. Orbit controls (YPR) are
+  /// not available for manipulators with less than 7 functions (values will be ignored). Additionally, inverse
+  /// kinematics is disabled for standard manipulator packages.
   auto set_ee_pose(std::uint8_t device_id, float x, float y, float z) const -> void;
 
   /// Set the global end-effector velocity (mm/s for linear velocity, rad/s for angular velocity).
   ///
-  /// For manipulators with less than 7 degrees of freedom, the angular velocity configurations are ignored.
-  ///
   /// The device ID should be set to the manipulator base.
+  ///
+  /// INFO: Inverse kinematics is not available for manipulators with less than 5 functions. Orbit controls (YPR) are
+  /// not available for manipulators with less than 7 functions (values will be ignored). Additionally, inverse
+  /// kinematics is disabled for standard manipulator packages.
   auto set_ee_velocity(std::uint8_t device_id, float vx, float vy, float vz, float vrz, float vry, float vrx) const
     -> void;
 
   /// Set the global linear velocity of the end-effector (mm/s).
+  ///
+  /// The device ID should be set to the manipulator base.
+  ///
+  /// INFO: Inverse kinematics is not available for manipulators with less than 5 functions. Orbit controls (YPR) are
+  /// not available for manipulators with less than 7 functions (values will be ignored). Additionally, inverse
+  /// kinematics is disabled for standard manipulator packages.
   auto set_ee_velocity(std::uint8_t device_id, float vx, float vy, float vz) const -> void;
 
   /// Set the local end-effector velocity (mm/s for linear velocity, rad/s for angular velocity).
   ///
-  /// This feature is not supported on devices with less than 7 functions.
-  ///
   /// The device ID should be set to the manipulator base.
+  ///
+  /// INFO: Inverse kinematics is not available for manipulators with less than 5 functions. Orbit controls (YPR) are
+  /// not available for manipulators with less than 7 functions (values will be ignored). Additionally, inverse
+  /// kinematics is disabled for standard manipulator packages.
   auto set_local_ee_velocity(std::uint8_t device_id, float vx, float vy, float vz, float vrz, float vry, float vrx)
     const -> void;
 
@@ -115,20 +131,20 @@ public:
 
   /// Move to a preset position.
   ///
-  /// This needs to be called at a rate of >10 Hz to continue driving to the preset position.
-  ///
   /// The device ID should be set to the manipulator base.
+  ///
+  /// INFO: This needs to be called at a rate of >10 Hz to continue driving to the preset position.
   auto go_to_preset_position(std::uint8_t device_id, std::uint8_t preset_id) const -> void;
 
   /// Save the current position as a position preset for the provided preset index.
   ///
-  /// There are 4 allocations for position presets given by index [0:3]
-  ///
-  /// The device ID should be set to the manipulator base.
+  /// INFO: For manipulators with 5+ functions, the positions preset capture packet be sent to the Base device. For
+  /// manipulators with 4 functions or fewer, the position preset capture packet must be sent to the individual axes
+  /// one-by-one (the 0xFF device ID is not valid).
   auto capture_preset_position(std::uint8_t device_id, std::uint8_t preset_id) const -> void;
 
   /// Set the specified preset position angles given the preset id [0:3] (rad for rotational joints, mm for linear
-  /// joints).
+  /// joints). Each position corresponds to one axis of the target device, starting from device ID 0x01.
   ///
   /// Unused positions should be set to 0.
   ///
@@ -167,8 +183,8 @@ public:
   /// This can be used to request state information from the device at a fixed rate. When using this function,
   /// a callback should be added to process the incoming responses.
   ///
-  /// Exercise caution when using this function in conjunction with the `request` function. If the same packets are
-  /// requested, the driver will send the packet to both the callback and as a future response.
+  /// WARNING: Exercise caution when using this function in conjunction with the `request` function. If the same packets
+  /// are requested, the driver will send the packet to both the callback and as a future response.
   auto request_at_rate(PacketId packet_id, std::uint8_t device_id, std::chrono::milliseconds rate) const -> void;
 
   /// Request up to 10 packets from the specified device at some rate.
@@ -176,8 +192,8 @@ public:
   /// This can be used to request state information from the device at a fixed rate. When using this function,
   /// a callback should be added to process the incoming responses.
   ///
-  /// Exercise caution when using this function in conjunction with the `request` function. If the same packets are
-  /// requested, the driver will send the packet to both the callback and as a future response.
+  /// WARNING: Exercise caution when using this function in conjunction with the `request` function. If the same packets
+  /// are requested, the driver will send the packet to both the callback and as a future response.
   auto request_at_rate(const std::vector<PacketId> & packet_ids, std::uint8_t device_id, std::chrono::milliseconds rate)
     const -> void;
 

@@ -73,7 +73,6 @@ public:
   auto on_set_chained_mode(bool chained_mode) -> bool override;
 
 protected:
-  // Forward declare a struct to hold the joint controller gains
   struct JointGains
   {
     JointGains(double damping, double stiffness)
@@ -102,7 +101,7 @@ protected:
   std::vector<double> position_error_;
   std::vector<double> velocity_error_;
 
-  realtime_tools::RealtimeBuffer<std::shared_ptr<reach_msgs::msg::MultiDOFImpedanceCommand>> reference_;
+  realtime_tools::RealtimeBuffer<reach_msgs::msg::MultiDOFImpedanceCommand> reference_;
   std::shared_ptr<rclcpp::Subscription<reach_msgs::msg::MultiDOFImpedanceCommand>> reference_sub_;
 
   std::shared_ptr<rclcpp::Publisher<reach_msgs::msg::MultiDOFImpedanceStateStamped>> controller_state_pub_;
@@ -117,16 +116,6 @@ protected:
 
   std::vector<JointGains> controller_gains_;
   std::vector<double> joint_friction_;
-
-private:
-  std::array<std::string, 2> required_state_types_{
-    hardware_interface::HW_IF_POSITION,
-    hardware_interface::HW_IF_VELOCITY};
-
-  std::array<std::string, 3> required_reference_types_{
-    hardware_interface::HW_IF_POSITION,
-    hardware_interface::HW_IF_VELOCITY,
-    hardware_interface::HW_IF_EFFORT};
 };
 
 }  // namespace reach::controllers

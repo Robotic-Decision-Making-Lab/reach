@@ -34,15 +34,23 @@ namespace reach::controllers
 namespace
 {
 
-auto reset_reference_msg(
-  std::shared_ptr<reach_msgs::msg::MultiDOFImpedanceCommand> & msg,
-  const std::vector<std::string> & joint_names) -> void
+auto reset_reference_msg(reach_msgs::msg::MultiDOFImpedanceCommand * msg, const std::vector<std::string> & joint_names)
+  -> void
 {
   msg->dof_names = joint_names;
   msg->torques.assign(joint_names.size(), std::numeric_limits<double>::quiet_NaN());
   msg->positions.assign(joint_names.size(), std::numeric_limits<double>::quiet_NaN());
   msg->velocities.assign(joint_names.size(), std::numeric_limits<double>::quiet_NaN());
 }
+
+std::array<std::string, 2> REQUIRED_STATE_INTERFACES{
+  hardware_interface::HW_IF_POSITION,
+  hardware_interface::HW_IF_VELOCITY};
+
+std::array<std::string, 3> REQUIRED_REFERENCE_INTERFACES{
+  hardware_interface::HW_IF_POSITION,
+  hardware_interface::HW_IF_VELOCITY,
+  hardware_interface::HW_IF_EFFORT};
 
 }  // namespace
 
@@ -94,12 +102,11 @@ auto ImpedanceController::on_configure(const rclcpp_lifecycle::State & /*previou
     return ret;
   }
 
-  const auto reference_msg = std::make_shared<reach_msgs::msg::MultiDOFImpedanceCommand>();
-  reference_.writeFromNonRT(reference_msg);
+  reference_.writeFromNonRT(reach_msgs::msg::MultiDOFImpedanceCommand());
 
   command_interfaces_.reserve(num_joints_);
 
-  system_state_values_.resize(required_state_types_.size() * num_joints_, std::numeric_limits<double>::quiet_NaN());
+  system_state_values_.resize(REQUIRED_STATE_INTERFACES.size() * num_joints_, std::numeric_limits<double>::quiet_NaN());
   position_error_.resize(num_joints_, std::numeric_limits<double>::quiet_NaN());
   velocity_error_.resize(num_joints_, std::numeric_limits<double>::quiet_NaN());
 
@@ -108,7 +115,7 @@ auto ImpedanceController::on_configure(const rclcpp_lifecycle::State & /*previou
     rclcpp::SystemDefaultsQoS(),
     [this](const std::shared_ptr<reach_msgs::msg::MultiDOFImpedanceCommand>
              msg) {  // NOLINT(performance-unnecessary-value-param)
-      reference_.writeFromNonRT(msg);
+      reference_.writeFromNonRT(*msg);
     });
 
   controller_state_pub_ = get_node()->create_publisher<reach_msgs::msg::MultiDOFImpedanceStateStamped>(
@@ -143,7 +150,7 @@ auto ImpedanceController::on_configure(const rclcpp_lifecycle::State & /*previou
 auto ImpedanceController::on_activate(const rclcpp_lifecycle::State & /*previous_state */)
   -> controller_interface::CallbackReturn
 {
-  reset_reference_msg(*(reference_.readFromNonRT()), joint_names_);
+  reset_reference_msg(reference_.readFromNonRT(), joint_names_);
 
   system_state_values_.assign(system_state_values_.size(), std::numeric_limits<double>::quiet_NaN());
   reference_interfaces_.assign(reference_interfaces_.size(), std::numeric_limits<double>::quiet_NaN());
@@ -175,9 +182,9 @@ auto ImpedanceController::state_interface_configuration() const -> controller_in
   controller_interface::InterfaceConfiguration config;
   config.type = controller_interface::interface_configuration_type::INDIVIDUAL;
 
-  config.names.reserve(required_state_types_.size() * num_joints_);
+  config.names.reserve(REQUIRED_STATE_INTERFACES.size() * num_joints_);
 
-  for (const auto & state : required_state_types_) {
+  for (const auto & state : REQUIRED_STATE_INTERFACES) {
     for (const auto & joint_name : joint_names_) {
       config.names.push_back(joint_name + "/" + state);  // NOLINT(performance-inefficient-string-concatenation)
     }
@@ -189,13 +196,13 @@ auto ImpedanceController::state_interface_configuration() const -> controller_in
 auto ImpedanceController::on_export_reference_interfaces() -> std::vector<hardware_interface::CommandInterface>
 {
   reference_interfaces_.resize(
-    required_reference_types_.size() * num_joints_, std::numeric_limits<double>::quiet_NaN());
+    REQUIRED_REFERENCE_INTERFACES.size() * num_joints_, std::numeric_limits<double>::quiet_NaN());
 
   std::vector<hardware_interface::CommandInterface> exported_interfaces;
   exported_interfaces.reserve(reference_interfaces_.size());
 
   std::size_t i = 0;
-  for (const auto & reference : required_reference_types_) {
+  for (const auto & reference : REQUIRED_REFERENCE_INTERFACES) {
     for (const auto & joint_name : joint_names_) {
       exported_interfaces.emplace_back(
         get_node()->get_name(),
@@ -215,14 +222,14 @@ auto ImpedanceController::update_reference_from_subscribers(
   auto * current_reference = reference_.readFromNonRT();
 
   std::size_t i = 0;
-  for (const auto & reference : required_reference_types_) {
+  for (const auto & reference : REQUIRED_REFERENCE_INTERFACES) {
     for (std::size_t j = 0; j < num_joints_; ++j) {
       if (reference == hardware_interface::HW_IF_POSITION) {
-        reference_interfaces_[i] = (*current_reference)->positions[j];
+        reference_interfaces_[i] = current_reference->positions[j];
       } else if (reference == hardware_interface::HW_IF_VELOCITY) {
-        reference_interfaces_[i] = (*current_reference)->velocities[j];
+        reference_interfaces_[i] = current_reference->velocities[j];
       } else if (reference == hardware_interface::HW_IF_EFFORT) {
-        reference_interfaces_[i] = (*current_reference)->torques[j];
+        reference_interfaces_[i] = current_reference->torques[j];
       } else {
         return controller_interface::return_type::ERROR;
       }
@@ -230,14 +237,14 @@ auto ImpedanceController::update_reference_from_subscribers(
     }
   }
 
-  reset_reference_msg(*current_reference, joint_names_);
+  reset_reference_msg(current_reference, joint_names_);
 
   return controller_interface::return_type::OK;
 }
 
 auto ImpedanceController::update_system_state_values() -> controller_interface::return_type
 {
-  for (std::size_t i = 0; i < required_state_types_.size(); ++i) {
+  for (std::size_t i = 0; i < REQUIRED_STATE_INTERFACES.size(); ++i) {
     for (std::size_t j = 0; j < num_joints_; ++j) {
       system_state_values_[i * num_joints_ + j] = state_interfaces_[i * num_joints_ + j].get_value();
     }

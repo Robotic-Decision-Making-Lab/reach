@@ -155,6 +155,7 @@ auto decode_packets(const std::vector<std::uint8_t> & data) -> std::vector<Packe
       continue;
     }
 
+    // TODO(evan-palmer): switch to std::optional instead of using a try-catch block
     try {
       const Packet packet = decode_packet(packet_data);
       packets.push_back(packet);
