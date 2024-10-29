@@ -164,23 +164,6 @@ auto Alpha5Hardware::on_configure(const rclcpp_lifecycle::State & /* previous_st
     return hardware_interface::CallbackReturn::ERROR;
   }
 
-  // Set the joint limits according to the values specified in the URDF
-  for (const auto & joint : info_.joints) {
-    for (const auto & interface : joint.command_interfaces) {
-      if (interface.name == hardware_interface::HW_IF_POSITION) {
-        alpha_->set_position_limits(
-          names_to_device_ids_[joint.name], std::stof(interface.min), std::stof(interface.max));
-      } else if (interface.name == hardware_interface::HW_IF_VELOCITY) {
-        // TODO(evan-palmer): convert the velocity limits to the appropriate units
-        alpha_->set_velocity_limits(
-          names_to_device_ids_[joint.name], std::stof(interface.min), std::stof(interface.max));
-      } else if (interface.name == hardware_interface::HW_IF_EFFORT) {
-        alpha_->set_current_limits(
-          names_to_device_ids_[joint.name], std::stof(interface.min), std::stof(interface.max));
-      }
-    }
-  }
-
   // Register the state callbacks
   // The device_ids_to_names_ map isn't dynamically updated, so we pass it by value to the lambda. This helps ensure
   // thread safety at the small expense of a couple copies.

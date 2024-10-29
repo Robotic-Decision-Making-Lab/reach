@@ -134,7 +134,6 @@ auto Client::poll_connection(std::uint16_t max_bytes_to_read) -> void
     auto last_delim = std::ranges::find(buffer | std::views::reverse, PACKET_DELIMITER);
 
     if (last_delim != buffer.rend()) {
-      // TODO(evan-palmer): switch to std::optional instead of using a try-catch block
       try {
         const std::vector<Packet> packets = decode_packets({buffer.begin(), last_delim.base()});
 

@@ -4,7 +4,7 @@ project(reach_description)
 find_package(ament_cmake REQUIRED)
 
 install(
-    DIRECTORY description meshes rviz config gazebo
+    DIRECTORY description meshes rviz config
     DESTINATION share/reach_description
 )
 

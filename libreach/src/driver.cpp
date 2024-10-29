@@ -139,16 +139,7 @@ auto ReachDriver::set_ee_pose(std::uint8_t device_id, float x, float y, float z,
 
 auto ReachDriver::set_ee_pose(std::uint8_t device_id, float x, float y, float z) const -> void
 {
-  send_packet(
-    PacketId::KM_END_POS,
-    device_id,
-    merge_bytes(
-      {convert_to_bytes<float>(x),
-       convert_to_bytes<float>(y),
-       convert_to_bytes<float>(z),
-       convert_to_bytes<float>(0.0F),
-       convert_to_bytes<float>(0.0F),
-       convert_to_bytes<float>(0.0F)}));
+  set_ee_pose(device_id, x, y, z, 0.0, 0.0, 0.0);
 }
 
 auto ReachDriver::set_ee_velocity(std::uint8_t device_id, float vx, float vy, float vz, float vrz, float vry, float vrx)
@@ -168,16 +159,7 @@ auto ReachDriver::set_ee_velocity(std::uint8_t device_id, float vx, float vy, fl
 
 auto ReachDriver::set_ee_velocity(std::uint8_t device_id, float vx, float vy, float vz) const -> void
 {
-  send_packet(
-    PacketId::KM_END_VEL,
-    device_id,
-    merge_bytes(
-      {convert_to_bytes<float>(vx),
-       convert_to_bytes<float>(vy),
-       convert_to_bytes<float>(vz),
-       convert_to_bytes<float>(0.0F),
-       convert_to_bytes<float>(0.0F),
-       convert_to_bytes<float>(0.0F)}));
+  set_ee_velocity(device_id, vx, vy, vz, 0.0, 0.0, 0.0);
 }
 
 auto ReachDriver::set_local_ee_velocity(
