@@ -42,6 +42,7 @@ target_sources(
             ${CMAKE_CURRENT_SOURCE_DIR}/include/libreach/serial_driver.hpp
             ${CMAKE_CURRENT_SOURCE_DIR}/include/libreach/udp_client.hpp
             ${CMAKE_CURRENT_SOURCE_DIR}/include/libreach/udp_driver.hpp
+            ${CMAKE_CURRENT_SOURCE_DIR}/include/libreach/version.hpp
 )
 
 target_compile_features(libreach PUBLIC cxx_std_23)
