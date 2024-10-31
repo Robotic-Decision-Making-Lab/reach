@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.8)
+cmake_minimum_required(VERSION 3.23)
 project(reach_controllers)
 
 if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
@@ -26,14 +26,14 @@ generate_parameter_library(impedance_controller_parameters
 )
 
 add_library(reach_controllers SHARED)
-target_sources(reach_controllers PRIVATE src/impedance_controller.cpp)
-
-target_include_directories(
+target_sources(
     reach_controllers
+    PRIVATE src/impedance_controller.cpp
     PUBLIC
-        $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
-        $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
-    PRIVATE ${PROJECT_SOURCE_DIR}/src
+        FILE_SET HEADERS
+        BASE_DIRS ${CMAKE_CURRENT_SOURCE_DIR}/include
+        FILES
+            ${CMAKE_CURRENT_SOURCE_DIR}/include/reach_controllers/impedance_controller.hpp
 )
 target_compile_features(reach_controllers PUBLIC cxx_std_20)
 target_link_libraries(reach_controllers PUBLIC impedance_controller_parameters)
@@ -44,15 +44,13 @@ ament_target_dependencies(reach_controllers
 
 pluginlib_export_plugin_description_file(controller_interface reach_controllers.xml)
 
-install(DIRECTORY include/ DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
-
 install(
     TARGETS reach_controllers impedance_controller_parameters
     EXPORT export_reach_controllers
     RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
     ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
-    INCLUDES DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+    FILE_SET HEADERS
 )
 
 ament_export_targets(export_reach_controllers HAS_LIBRARY_TARGET)

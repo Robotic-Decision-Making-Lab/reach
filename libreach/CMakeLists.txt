@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.8)
+cmake_minimum_required(VERSION 3.23)
 project(
     libreach
     VERSION 0.1.2
@@ -69,14 +69,14 @@ endforeach()
 
 install(
     TARGETS libreach
-    EXPORT libreachTargets
+    EXPORT export_libreach
     RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
     ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
     FILE_SET HEADERS
 )
 
-ament_export_targets(libreachTargets HAS_LIBRARY_TARGET)
+ament_export_targets(export_libreach HAS_LIBRARY_TARGET)
 ament_export_dependencies(Boost)
 
 ament_package()

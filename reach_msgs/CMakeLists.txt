@@ -10,13 +10,13 @@ find_package(builtin_interfaces REQUIRED)
 find_package(rosidl_default_generators REQUIRED)
 find_package(std_msgs REQUIRED)
 
-set(msg_files
+set(MSG_FILES
     msg/MultiDOFImpedanceCommand.msg
     msg/MultiDOFImpedanceStateStamped.msg
 )
 
 rosidl_generate_interfaces(reach_msgs
-  ${msg_files}
+  ${MSG_FILES}
   DEPENDENCIES
     builtin_interfaces
     std_msgs

@@ -43,11 +43,11 @@ auto reset_reference_msg(reach_msgs::msg::MultiDOFImpedanceCommand * msg, const 
   msg->velocities.assign(joint_names.size(), std::numeric_limits<double>::quiet_NaN());
 }
 
-std::array<std::string, 2> REQUIRED_STATE_INTERFACES{
+const std::array<std::string, 2> REQUIRED_STATE_INTERFACES{
   hardware_interface::HW_IF_POSITION,
   hardware_interface::HW_IF_VELOCITY};
 
-std::array<std::string, 3> REQUIRED_REFERENCE_INTERFACES{
+const std::array<std::string, 3> REQUIRED_REFERENCE_INTERFACES{
   hardware_interface::HW_IF_POSITION,
   hardware_interface::HW_IF_VELOCITY,
   hardware_interface::HW_IF_EFFORT};
@@ -61,7 +61,7 @@ auto ImpedanceController::on_init() -> controller_interface::CallbackReturn
     params_ = param_listener_->get_params();
   }
   catch (const std::exception & e) {
-    fprintf(stderr, "An exception occurred while initializing the controller: %s\n", e.what());
+    std::cerr << "An exception occurred while initializing the controller: " << e.what() << "\n";
     return controller_interface::CallbackReturn::ERROR;
   }
 
