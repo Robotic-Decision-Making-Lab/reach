@@ -25,6 +25,7 @@
 
 #include "libreach/client.hpp"
 
+#include <algorithm>
 #include <iostream>
 #include <ranges>
 #include <sstream>
@@ -111,9 +112,8 @@ auto Client::check_heartbeat(std::chrono::seconds timeout) -> void
   const bool timeout_occurred = std::chrono::steady_clock::now() - last_heartbeat_ > timeout;
 
   if (timeout_occurred && connection_state_ == ConnectionState::CONNECTED) {
-    std::stringstream ss;
-    ss << "Client timeout occurred; heartbeat has not been received in the last " << timeout.count() << " seconds\n";
-    std::cout << ss.str();
+    std::cerr << std::format(
+      "Client timeout occurred; heartbeat has not been received in the last {} seconds\n", timeout.count());
   } else if (!timeout_occurred && connection_state_ == ConnectionState::DISCONNECTED) {
     std::cout << "Client connection established\n";
   }
@@ -128,32 +128,32 @@ auto Client::poll_connection(std::uint16_t max_bytes_to_read) -> void
 
   while (running_.load()) {
     if (read_bytes(buffer, n_bytes_to_read) < 0) {
-      std::cout << "Failed to read from the robot; the connection was likely lost.\n";
+      std::cerr << "Failed to read from the robot; the connection was likely lost.\n";
     }
 
     auto last_delim = std::ranges::find(buffer | std::views::reverse, PACKET_DELIMITER);
 
-    if (last_delim != buffer.rend()) {
-      try {
-        const std::vector<Packet> packets = decode_packets({buffer.begin(), last_delim.base()});
+    if (last_delim == buffer.rend()) {
+      continue;
+    }
 
-        if (!packets.empty()) {
-          auto it = std::ranges::find_if(
-            packets, [](const Packet & packet) { return packet.packet_id() == PacketId::SOFTWARE_VERSION; });
+    try {
+      const std::vector<Packet> packets = decode_packets({buffer.begin(), last_delim.base()});
 
-          if (it != packets.end()) {
-            set_last_heartbeat(std::chrono::steady_clock::now());
-          }
-
-          packet_callback_(packets);
+      if (!packets.empty()) {
+        if (std::ranges::any_of(
+              packets, [](const Packet & packet) { return packet.packet_id() == PacketId::SOFTWARE_VERSION; })) {
+          set_last_heartbeat(std::chrono::steady_clock::now());
         }
 
-        buffer.erase(buffer.begin(), last_delim.base());
+        packet_callback_(packets);
       }
-      catch (const std::exception & e) {
-        std::cout << "An error occurred while attempting to decode a packet: " << e.what() << "\n";
-        buffer.clear();
-      }
+
+      buffer.erase(buffer.begin(), last_delim.base());
+    }
+    catch (const std::exception & e) {
+      std::cerr << "An error occurred while attempting to decode a packet: " << e.what() << "\n";
+      buffer.clear();
     }
 
     n_bytes_to_read = max_bytes_to_read - buffer.size();

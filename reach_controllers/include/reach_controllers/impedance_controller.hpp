@@ -75,12 +75,14 @@ public:
 protected:
   struct JointGains
   {
-    JointGains(double damping, double stiffness)
-    : damping(damping),
+    JointGains(double friction, double damping, double stiffness)
+    : friction(friction),
+      damping(damping),
       stiffness(stiffness)
     {
     }
 
+    double friction;
     double damping;
     double stiffness;
   };
@@ -115,7 +117,6 @@ protected:
   std::size_t num_joints_;
 
   std::vector<JointGains> controller_gains_;
-  std::vector<double> joint_friction_;
 };
 
 }  // namespace reach::controllers

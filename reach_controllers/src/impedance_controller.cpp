@@ -84,11 +84,12 @@ auto ImpedanceController::configure_parameters() -> controller_interface::Callba
   joint_names_ = params_.joints;
   num_joints_ = joint_names_.size();
 
-  joint_friction_ = params_.friction;
-
   controller_gains_.reserve(num_joints_);
   for (const auto & name : joint_names_) {
-    controller_gains_.emplace_back(params_.gains.joints_map[name].damping, params_.gains.joints_map[name].stiffness);
+    controller_gains_.emplace_back(
+      params_.gains.joints_map[name].friction,
+      params_.gains.joints_map[name].damping,
+      params_.gains.joints_map[name].stiffness);
   }
 
   return controller_interface::CallbackReturn::SUCCESS;
@@ -127,6 +128,7 @@ auto ImpedanceController::on_configure(const rclcpp_lifecycle::State & /*previou
 
   auto p_terms = controller_gains_ | std::views::transform([](const auto & gains) { return gains.damping; });
   auto d_terms = controller_gains_ | std::views::transform([](const auto & gains) { return gains.stiffness; });
+  auto ff_terms = controller_gains_ | std::views::transform([](const auto & gains) { return gains.friction; });
 
   rt_controller_state_pub_->lock();
   rt_controller_state_pub_->msg_.dof_names = joint_names_;
@@ -134,13 +136,15 @@ auto ImpedanceController::on_configure(const rclcpp_lifecycle::State & /*previou
   rt_controller_state_pub_->msg_.position_errors.resize(num_joints_, std::numeric_limits<double>::quiet_NaN());
   rt_controller_state_pub_->msg_.velocity_errors.resize(num_joints_, std::numeric_limits<double>::quiet_NaN());
   rt_controller_state_pub_->msg_.outputs.resize(num_joints_, std::numeric_limits<double>::quiet_NaN());
-  rt_controller_state_pub_->msg_.friction_terms = joint_friction_;
 
   rt_controller_state_pub_->msg_.p_terms.clear();
   std::ranges::copy(p_terms, std::back_inserter(rt_controller_state_pub_->msg_.p_terms));
 
   rt_controller_state_pub_->msg_.d_terms.clear();
   std::ranges::copy(d_terms, std::back_inserter(rt_controller_state_pub_->msg_.d_terms));
+
+  rt_controller_state_pub_->msg_.friction_terms.clear();
+  std::ranges::copy(ff_terms, std::back_inserter(rt_controller_state_pub_->msg_.friction_terms));
 
   rt_controller_state_pub_->unlock();
 
@@ -267,17 +271,12 @@ auto ImpedanceController::update_and_write_commands(const rclcpp::Time & time, c
     position_error_[i] = reference_interfaces_[i] - system_state_values_[i];
     velocity_error_[i] = reference_interfaces_[num_joints_ + i] - system_state_values_[num_joints_ + i];
 
-    const double feedforward = reference_interfaces_[2 * num_joints_ + i];
-
     double command = std::numeric_limits<double>::quiet_NaN();
 
-    if (!std::isnan(position_error_[i]) && !std::isnan(velocity_error_[i]) && !std::isnan(feedforward)) {
+    if (!std::isnan(position_error_[i]) && !std::isnan(velocity_error_[i])) {
       // Calculate the impedance control
-      command = feedforward + controller_gains_[i].damping * velocity_error_[i] +
+      command = controller_gains_[i].friction + controller_gains_[i].damping * velocity_error_[i] +
                 controller_gains_[i].stiffness * position_error_[i];
-
-      // Add friction compensation
-      command += joint_friction_[i];
     }
 
     command_interfaces_[i].set_value(command);
@@ -293,7 +292,7 @@ auto ImpedanceController::update_and_write_commands(const rclcpp::Time & time, c
       rt_controller_state_pub_->msg_.outputs[i] = command_interfaces_[i].get_value();
       rt_controller_state_pub_->msg_.p_terms[i] = controller_gains_[i].damping;
       rt_controller_state_pub_->msg_.d_terms[i] = controller_gains_[i].stiffness;
-      rt_controller_state_pub_->msg_.friction_terms[i] = joint_friction_[i];
+      rt_controller_state_pub_->msg_.friction_terms[i] = controller_gains_[i].friction;
     }
 
     rt_controller_state_pub_->unlockAndPublish();

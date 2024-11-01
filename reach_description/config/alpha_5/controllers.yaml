@@ -2,5 +2,99 @@ controller_manager:
   ros__parameters:
     update_rate: 225 # Hz
 
+    forward_velocity_controller:
+      type: forward_command_controller/ForwardCommandController
+
+    forward_position_controller:
+      type: forward_command_controller/ForwardCommandController
+
+    impedance_controller:
+      type: reach_controllers/ImpedanceController
+
     joint_state_broadcaster:
       type: joint_state_broadcaster/JointStateBroadcaster
+
+    feedback_joint_position_trajectory_controller:
+      type: joint_trajectory_controller/JointTrajectoryController
+
+    feedback_joint_velocity_trajectory_controller:
+      type: joint_trajectory_controller/JointTrajectoryController
+
+
+forward_velocity_controller:
+  ros__parameters:
+    joints:
+      - axis_a
+      - axis_b
+      - axis_c
+      - axis_d
+      - axis_e
+    interface_name: velocity
+
+forward_position_controller:
+  ros__parameters:
+    joints:
+      - axis_a
+      - axis_b
+      - axis_c
+      - axis_d
+      - axis_e
+    interface_name: position
+
+feedback_joint_position_trajectory_controller:
+  ros__parameters:
+    joints:
+      - axis_a
+      - axis_b
+      - axis_c
+      - axis_d
+      - axis_e
+    command_interfaces:
+      - position
+    state_interfaces:
+      - position
+      - velocity
+
+feedback_joint_velocity_trajectory_controller:
+  ros__parameters:
+    joints:
+      - axis_a
+      - axis_b
+      - axis_c
+      - axis_d
+      - axis_e
+    command_interfaces:
+      - velocity
+    state_interfaces:
+      - position
+      - velocity
+
+impedance_controller:
+  ros__parameters:
+    joints:
+      - axis_a
+      - axis_b
+      - axis_c
+      - axis_d
+      - axis_e
+    gains:
+      axis_a:
+        friction: 0.000469
+        stiffness: 40.0
+        damping: 10.0
+      axis_b:
+        friction: 0.000469
+        stiffness: 40.0
+        damping: 10.0
+      axis_c:
+        friction: 0.003752
+        stiffness: 40.0
+        damping: 10.0
+      axis_d:
+        friction: 0.003752
+        stiffness: 40.0
+        damping: 10.0
+      axis_e:
+        friction: 0.003752
+        stiffness: 40.0
+        damping: 10.0

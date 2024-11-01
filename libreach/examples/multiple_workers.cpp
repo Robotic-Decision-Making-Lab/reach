@@ -58,7 +58,6 @@ auto main() -> int
   // Register a callback for the POSITION packet
   driver.register_callback(libreach::PacketId::POSITION, [&m, &joint_positions](const libreach::Packet & packet) {
     const auto position = libreach::deserialize<float>(packet);
-
     const std::lock_guard<std::mutex> lock(m);
     joint_positions[static_cast<std::size_t>(packet.device_id()) - 1] = position;
   });
