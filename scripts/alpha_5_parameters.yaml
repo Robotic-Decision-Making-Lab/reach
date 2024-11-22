@@ -1,3 +1,5 @@
+# parameters from datasheet provided by Reach. Note: The moments of inertia are provided in the link's output frame and the COM is aligned with the output coordinate system. Additionally, the SolidWorks convention has been used. For more details, see the datasheet. 
+
 alpha_5:
   links:
     - link_0

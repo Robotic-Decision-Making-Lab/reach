@@ -104,6 +104,26 @@ def _load_file_params(fp: str) -> list[Params]:
 
 def convert_to_ros_conventions(params: list[Params]):
     # TODO: Implement this function
+    '''Note: the URDF standard expect the inertia tensor to be located at the COM and aligned with the output
+    coordinate system. Additionally, the URDF standard assumes a negative product of inertia convention.
+    The parameters provided in Table 2 use the SolidWorks convention and do not comply with the URDF
+    standard. See the documentation at wiki.ros.org/urdf/XML/link and www.mathworks.com/help/specifycustom-
+    inertia for more details.
+    '''
+    for link in params:
+        link.inertial.I_com[0,1] *= -1
+        link.inertial.I_com[1,0] *= -1
+        link.inertial.I_com[0,2] *= -1
+        link.inertial.I_com[2,0] *= -1
+        link.inertial.I_com[1,2] *= -1
+        link.inertial.I_com[2,1] *= -1
+
+        link.inertial.I_link[0,1] *= -1
+        link.inertial.I_link[1,0] *= -1
+        link.inertial.I_link[0,2] *= -1
+        link.inertial.I_link[2,0] *= -1
+        link.inertial.I_link[1,2] *= -1
+        link.inertial.I_link[2,1] *= -1
     pass
 
 
@@ -114,7 +134,7 @@ def parse_args() -> Namespace:
         type=str,
         required=False,
         help="Path to the parameters file",
-        default="/home/ubuntu/ws_ros/src/reach/scripts/alpha_5_parameters.yaml",
+        default="/home/parallels/ws_reach/src/reach/scripts/alpha_5_parameters.yaml",
     )
 
     return parser.parse_args()
