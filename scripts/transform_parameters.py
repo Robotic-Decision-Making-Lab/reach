@@ -63,7 +63,7 @@ class Params:
     dh: DHParameters
 
 
-def _load_file_params(fp: str) -> list[Params]:
+def load_file_params(fp: str) -> list[Params]:
     params = []
 
     with open(fp, "r") as f:
@@ -122,5 +122,5 @@ def parse_args() -> Namespace:
 
 if __name__ == "__main__":
     args = parse_args()
-    params = _load_file_params(args.file_path)
+    params = load_file_params(args.file_path)
     convert_to_ros_conventions(params)

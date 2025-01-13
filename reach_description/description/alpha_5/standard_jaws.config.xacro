@@ -16,6 +16,8 @@
              default="" />
   <xacro:arg name="use_sim"
              default="false" />
+  <xacro:arg name="parent"
+             default="world" />
 
   <!-- initial positions used for simulation -->
   <xacro:arg name="initial_positions_file"
@@ -30,7 +32,7 @@
   <link name="world" />
 
   <!-- arm -->
-  <xacro:alpha_urdf parent="world"
+  <xacro:alpha_urdf parent="${parent}"
                     prefix="${prefix}">
     <origin xyz="0 0 0"
             rpy="0 0 0" />
@@ -45,7 +47,7 @@
   <!-- ros2_control interface -->
   <xacro:alpha_system prefix="${prefix}"
                       serial_port="$(arg serial_port)"
-                      initial_positions_file="/home/ubuntu/ws_ros/src/reach/reach_description/config/alpha_5/initial_positions.yaml"
+                      initial_positions_file="$(arg initial_positions_file)"
                       use_sim="${use_sim}"
                       use_fake_hardware="$(arg use_fake_hardware)" />
 
