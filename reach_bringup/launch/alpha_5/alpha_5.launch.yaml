@@ -65,3 +65,14 @@ launch:
           value: $(var use_sim)
         - name: robot_description
           value: $(var robot_description)
+
+  - node:
+      pkg: rviz2
+      exec: rviz2
+      if: $(var use_rviz)
+      args: -d $(var rviz_config)
+      param:
+        - name: robot_description
+          value: $(var robot_description)
+        - name: use_sim_time
+          value: $(var use_sim)

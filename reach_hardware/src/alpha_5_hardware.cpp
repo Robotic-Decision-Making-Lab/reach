@@ -171,14 +171,16 @@ auto Alpha5Hardware::on_configure(const rclcpp_lifecycle::State & /* previous_st
     libreach::PacketId::POSITION, [this, ids_to_names = device_ids_to_names_](const libreach::Packet & packet) {
       const auto position = static_cast<double>(libreach::deserialize<float>(packet));
       const std::lock_guard<std::mutex> lock(position_state_lock_);
-      async_states_positions_[ids_to_names.at(packet.device_id())] = position;
+      async_states_positions_[ids_to_names.at(packet.device_id())] =
+        packet.device_id() == std::to_underlying(libreach::Alpha5DeviceId::JOINT_A) ? position / 1000.0 : position;
     });
 
   alpha_->register_callback(
     libreach::PacketId::VELOCITY, [this, ids_to_names = device_ids_to_names_](const libreach::Packet & packet) {
       const auto velocity = static_cast<double>(libreach::deserialize<float>(packet));
       const std::lock_guard<std::mutex> lock(velocity_state_lock_);
-      async_states_velocities_[ids_to_names.at(packet.device_id())] = velocity;
+      async_states_velocities_[ids_to_names.at(packet.device_id())] =
+        packet.device_id() == std::to_underlying(libreach::Alpha5DeviceId::JOINT_A) ? velocity / 1000.0 : velocity;
     });
 
   alpha_->register_callback(
