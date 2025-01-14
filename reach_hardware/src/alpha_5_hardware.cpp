@@ -87,11 +87,11 @@ auto Alpha5Hardware::on_init(const hardware_interface::HardwareInfo & info) -> h
   }
 
   for (const auto & [name, desc] : joint_state_interfaces_) {
-    if (desc.interface_name == hardware_interface::HW_IF_POSITION) {
+    if (desc.interface_info.name == hardware_interface::HW_IF_POSITION) {
       async_states_positions_[desc.prefix_name] = std::numeric_limits<float>::quiet_NaN();
-    } else if (desc.interface_name == hardware_interface::HW_IF_VELOCITY) {
+    } else if (desc.interface_info.name == hardware_interface::HW_IF_VELOCITY) {
       async_states_velocities_[desc.prefix_name] = std::numeric_limits<float>::quiet_NaN();
-    } else if (desc.interface_name == hardware_interface::HW_IF_EFFORT) {
+    } else if (desc.interface_info.name == hardware_interface::HW_IF_EFFORT) {
       async_states_efforts_[desc.prefix_name] = std::numeric_limits<float>::quiet_NaN();
     }
   }
@@ -105,7 +105,7 @@ auto Alpha5Hardware::on_init(const hardware_interface::HardwareInfo & info) -> h
       return hardware_interface::CallbackReturn::ERROR;
     }
 
-    const std::uint8_t device_id = static_cast<std::uint8_t>(std::stoi(it->second));
+    const auto device_id = static_cast<std::uint8_t>(std::stoi(it->second));
     device_ids_to_names_[device_id] = joint.name;
     names_to_device_ids_[joint.name] = device_id;
 
@@ -215,12 +215,6 @@ auto Alpha5Hardware::prepare_command_mode_switch(
         control_modes_[joint.name] = libreach::Mode::VELOCITY;
       } else if (key == joint.name + "/" + hardware_interface::HW_IF_EFFORT) {
         control_modes_[joint.name] = libreach::Mode::CURRENT;
-      } else {
-        RCLCPP_ERROR(
-          logger_,
-          "Unknown command mode for joint '%s': '%s'. Setting mode to 'STANDBY'",
-          joint.name.c_str(),
-          key.c_str());
       }
     }
   }
@@ -261,11 +255,11 @@ auto Alpha5Hardware::read(const rclcpp::Time & /* time */, const rclcpp::Duratio
   const std::scoped_lock lock{position_state_lock_, velocity_state_lock_, effort_state_lock_};
 
   for (const auto & [name, desc] : joint_state_interfaces_) {
-    if (desc.interface_name == hardware_interface::HW_IF_POSITION) {
+    if (desc.interface_info.name == hardware_interface::HW_IF_POSITION) {
       set_state(name, async_states_positions_[desc.prefix_name]);
-    } else if (desc.interface_name == hardware_interface::HW_IF_VELOCITY) {
+    } else if (desc.interface_info.name == hardware_interface::HW_IF_VELOCITY) {
       set_state(name, async_states_velocities_[desc.prefix_name]);
-    } else if (desc.interface_name == hardware_interface::HW_IF_EFFORT) {
+    } else if (desc.interface_info.name == hardware_interface::HW_IF_EFFORT) {
       set_state(name, async_states_efforts_[desc.prefix_name]);
     }
   }

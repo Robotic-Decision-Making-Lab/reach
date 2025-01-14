@@ -160,7 +160,8 @@ auto decode_packets(const std::vector<std::uint8_t> & data) -> std::vector<Packe
       packets.push_back(packet);
     }
     catch (const std::exception & e) {
-      std::cout << "An error occurred while attempting to decode a packet: " << e.what() << "\n";
+      // TODO(evan-palmer): Right now the logging spams the console with errors. This should be refactored when
+      // std::expected is integrated.
     }
   }
 
