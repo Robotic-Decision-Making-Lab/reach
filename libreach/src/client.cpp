@@ -51,6 +51,8 @@ Client::Client(std::function<void(const std::vector<Packet> &)> && callback, std
   });
 }
 
+Client::~Client() { shutdown_client(); }
+
 auto Client::start_polling_connection(std::uint16_t max_bytes_to_read) -> void
 {
   polling_thread_ = std::thread(&Client::poll_connection, this, max_bytes_to_read);

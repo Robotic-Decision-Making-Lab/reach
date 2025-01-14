@@ -54,7 +54,7 @@ public:
     std::chrono::seconds session_timeout,
     std::uint16_t max_bytes_to_read = 64);
 
-  ~UdpClient() override;
+  ~UdpClient();
 
 private:
   /// Read n bytes from the UDP socket into a buffer.

@@ -279,7 +279,10 @@ auto ImpedanceController::update_and_write_commands(const rclcpp::Time & time, c
                 controller_gains_[i].stiffness * position_error_[i];
     }
 
-    command_interfaces_[i].set_value(command);
+    if (!command_interfaces_[i].set_value(command)) {
+      std::cerr << "Failed to set command for joint " << joint_names_[i] << "\n";
+      return controller_interface::return_type::ERROR;
+    }
   }
 
   if (rt_controller_state_pub_ && rt_controller_state_pub_->trylock()) {

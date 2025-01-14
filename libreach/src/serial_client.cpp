@@ -95,11 +95,7 @@ SerialClient::SerialClient(
   start_polling_connection(max_bytes_to_read);
 }
 
-SerialClient::~SerialClient()
-{
-  shutdown_client();
-  close(handle_);
-}
+SerialClient::~SerialClient() { close(handle_); }
 
 auto SerialClient::write_to_connection(const std::vector<std::uint8_t> & data) const -> ssize_t
 {

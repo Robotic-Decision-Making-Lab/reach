@@ -8,7 +8,7 @@
   <xacro:include filename="$(find reach_description)/description/alpha_5/end_effectors/standard_jaws.urdf.xacro" />
 
   <!-- parameters -->
-  <xacro:arg name="use_fake_hardware"
+  <xacro:arg name="use_mock_hardware"
              default="true" />
   <xacro:arg name="serial_port"
              default="" />
@@ -32,7 +32,7 @@
   <link name="world" />
 
   <!-- arm -->
-  <xacro:alpha_urdf parent="${parent}"
+  <xacro:alpha_urdf parent="$(arg parent)"
                     prefix="${prefix}">
     <origin xyz="0 0 0"
             rpy="0 0 0" />
@@ -49,6 +49,6 @@
                       serial_port="$(arg serial_port)"
                       initial_positions_file="$(arg initial_positions_file)"
                       use_sim="${use_sim}"
-                      use_fake_hardware="$(arg use_fake_hardware)" />
+                      use_mock_hardware="$(arg use_mock_hardware)" />
 
 </robot>

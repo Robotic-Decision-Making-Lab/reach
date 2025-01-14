@@ -48,7 +48,7 @@ public:
     std::chrono::seconds session_timeout,
     std::uint16_t max_bytes_to_read = 32);
 
-  ~SerialClient() override;
+  ~SerialClient();
 
 private:
   /// Read n bytes from the serial port into a buffer.

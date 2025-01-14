@@ -44,7 +44,7 @@ public:
   Client(std::function<void(const std::vector<Packet> &)> && callback, std::chrono::seconds session_timeout);
 
   /// Destructor.
-  virtual ~Client() = default;
+  ~Client();
 
   /// Check if the client is connected to the robot and running.
   [[nodiscard]] auto connected() const -> bool;

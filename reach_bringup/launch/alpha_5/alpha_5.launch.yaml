@@ -1,67 +1,67 @@
 launch:
   - arg:
-      name: "prefix"
+      name: prefix
       default: ""
+      description: "The prefix used in the robot description. This should be provided in the form `<prefix>/`."
 
   - arg:
-      name: "serial_port"
-      default: "/dev/ttyUSB0"
+      name: serial_port
+      default: /dev/ttyUSB0
+      description: "The serial port used to communicate with the robot, e.g., `/dev/ttyUSB0`."
 
   - arg:
-      name: "use_rviz"
+      name: use_rviz
       default: "true"
+      description: "Launch RViz."
 
   - arg:
-      name: "use_sim"
+      name: use_sim
       default: "false"
+      description: "Use the Gazebo ros2_control hardware interface."
 
   - arg:
-      name: "rviz_config"
-      default: $(find-pkg-share reach_description)/rviz/view_alpha.rviz
+      name: use_mock_hardware
+      default: "true"
+      description: "Use the mock hardware interface. This is not used if `use_sim` is true."
 
-  - let:
+  - arg:
+      name: parent_link
+      default: world
+      description: "The parent link of the robot. This is useful for affixing the Alpha 5 to another robot."
+
+  - arg:
+      name: rviz_config
+      default: $(find-pkg-share reach_description)/rviz/view_alpha.rviz
+      description: "The RViz configuration file."
+
+  - arg:
       name: description_file
-      value: $(find-pkg-share reach_description)/description/alpha_5/config.xacro
+      default: $(find-pkg-share reach_description)/description/alpha_5/standard_jaws.config.xacro
+      description: "The robot description file."
+
+  - arg:
+      name: controllers_file
+      default: $(find-pkg-share reach_description)/config/alpha_5/controllers.yaml
+      description: "The ros2_control controllers configuration file."
 
   - arg:
       name: robot_description
-      default: $(command 'xacro $(var description_file) serial_port:=$(var serial_port) use_sim:=$(var use_sim) prefix:=$(var prefix)')
+      default: $(command 'xacro $(var description_file) serial_port:=$(var serial_port) use_sim:=$(var use_sim) prefix:=$(var prefix) use_mock_hardware:=$(var use_mock_hardware) parent:=$(var parent_link)')
+      description: "The robot description."
 
-  - node:
-      pkg: robot_state_publisher
-      exec: robot_state_publisher
-      param:
+  - arg:
+      name: robot_controller
+      default: forward_position_controller
+      description: "The robot controller to use."
+
+  - include:
+      file: $(find-pkg-share reach_bringup)/launch/alpha_5/control.launch.py
+      arg:
+        - name: controllers_file
+          value: $(var controllers_file)
+        - name: robot_controller
+          value: $(var robot_controller)
+        - name: use_sim
+          value: $(var use_sim)
         - name: robot_description
           value: $(var robot_description)
-        - name: use_sim_time
-          value: $(var use_sim)
-
-  - node:
-      pkg: controller_manager
-      exec: ros2_control_node
-      param:
-        - from: $(find-pkg-share reach_description)/config/alpha_5/controllers.yaml
-        - name: use_sim_time
-          value: $(var use_sim)
-      remap:
-        - from: /controller_manager/robot_description
-          to: /robot_description
-
-  - node:
-      pkg: controller_manager
-      exec: spawner
-      args: joint_state_broadcaster --controller-manager controller_manager
-      param:
-        - name: use_sim_time
-          value: $(var use_sim)
-
-  - node:
-      pkg: rviz2
-      exec: rviz2
-      if: $(var use_rviz)
-      args: -d $(var rviz_config)
-      param:
-        - name: robot_description
-          value: $(var robot_description)
-        - name: use_sim_time
-          value: $(var use_sim)

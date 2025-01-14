@@ -69,10 +69,6 @@ auto validate_interfaces(
   const std::vector<hardware_interface::InterfaceInfo> & interfaces,
   const std::vector<std::string> & valid_interfaces) -> bool
 {
-  if (interfaces.size() != valid_interfaces.size()) {
-    return false;
-  }
-
   return std::ranges::all_of(interfaces, [valid_interfaces](const hardware_interface::InterfaceInfo & interface) {
     return std::ranges::any_of(
       valid_interfaces, [interface](const std::string & valid_interface) { return interface.name == valid_interface; });
@@ -103,7 +99,13 @@ auto Alpha5Hardware::on_init(const hardware_interface::HardwareInfo & info) -> h
   for (const auto & joint : info_.joints) {
     // Create a lookup table for the device IDs. This prevents us from needing to search for the device ID each time we
     // want to send a command or request state information.
-    const auto device_id = static_cast<std::uint8_t>(std::stoi(joint.parameters.at("device_id")));
+    const auto it = joint.parameters.find("device_id");
+    if (it == joint.parameters.end()) {
+      RCLCPP_ERROR(logger_, "Joint '%s' is missing the 'device_id' parameter", joint.name.c_str());
+      return hardware_interface::CallbackReturn::ERROR;
+    }
+
+    const std::uint8_t device_id = static_cast<std::uint8_t>(std::stoi(it->second));
     device_ids_to_names_[device_id] = joint.name;
     names_to_device_ids_[joint.name] = device_id;
 
@@ -135,8 +137,6 @@ auto Alpha5Hardware::on_init(const hardware_interface::HardwareInfo & info) -> h
   }
 
   serial_port_ = info_.hardware_parameters.at("serial_port");
-
-  RCLCPP_INFO(logger_, "Successfully initialized Alpha5Hardware system interface");  // NOLINT
 
   return hardware_interface::CallbackReturn::SUCCESS;
 }
@@ -285,7 +285,7 @@ auto Alpha5Hardware::write(const rclcpp::Time & /* time */, const rclcpp::Durati
     const auto id = names_to_device_ids_.at(desc.prefix_name);
     const auto id_cast = static_cast<libreach::Alpha5DeviceId>(id);
 
-    double position, velocity, current;
+    double position, velocity, current;  // NOLINT
 
     switch (control_modes_.at(desc.prefix_name)) {
       case libreach::Mode::POSITION:

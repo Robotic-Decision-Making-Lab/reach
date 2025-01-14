@@ -65,11 +65,7 @@ UdpClient::UdpClient(
   start_polling_connection(max_bytes_to_read);
 }
 
-UdpClient::~UdpClient()
-{
-  shutdown_client();
-  close(socket_);
-}
+UdpClient::~UdpClient() { close(socket_); }
 
 auto UdpClient::write_to_connection(const std::vector<std::uint8_t> & data) const -> ssize_t
 {
