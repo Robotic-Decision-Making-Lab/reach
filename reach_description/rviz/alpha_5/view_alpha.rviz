@@ -63,67 +63,6 @@ Visualization Manager:
         Expand Link Details: false
         Expand Tree: false
         Link Tree Style: Links in Alphabetic Order
-        base_link:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
-        m1_link:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
-        m2_1_1_link:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
-        m2_1_3_link:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
-        m2_link:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
-        m3_inline_link:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
-        push_rod:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
-        rs1_124_link:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
-        rs1_130_link:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
-        rs1_139_link:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
-        tcp:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-        world:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-      Mass Properties:
-        Inertia: false
-        Mass: false
       Name: RobotModel
       TF Prefix: ""
       Update Interval: 0

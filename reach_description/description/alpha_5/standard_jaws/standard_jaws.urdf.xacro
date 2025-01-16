@@ -2,8 +2,9 @@
 <robot xmlns:xacro="http://ros.org/wiki/xacro">
 
   <xacro:macro name="standard_jaws"
-               params="parent prefix axis_a">
+               params="parent prefix mimic_joint">
 
+    <!-- links -->
     <link name="${prefix}rs1_130_link">
       <visual>
         <geometry>
@@ -60,6 +61,7 @@
       </inertial>
     </link>
 
+    <!-- define a tcp link for planning/control purposes -->
     <link name="${prefix}tcp">
       <inertial>
         <mass value="0.0001" />
@@ -72,6 +74,7 @@
       </inertial>
     </link>
 
+    <!-- joints -->
     <joint name="${prefix}rs1_130_joint"
            type="revolute">
       <origin xyz="0 0.0155 0.0069"
@@ -83,7 +86,7 @@
              upper="0.5"
              effort="10"
              velocity="10" />
-      <mimic joint="${axis_a}"
+      <mimic joint="${mimic_joint}"
              multiplier="51"
              offset="0" />
     </joint>

@@ -10,6 +10,7 @@ def generate_launch_description() -> LaunchDescription:
     args = [
         DeclareLaunchArgument("controllers_file"),
         DeclareLaunchArgument("robot_controller"),
+        DeclareLaunchArgument("tcp_controller"),
         DeclareLaunchArgument("use_sim"),
         DeclareLaunchArgument("robot_description"),
     ]
@@ -53,6 +54,13 @@ def generate_launch_description() -> LaunchDescription:
         parameters=[{"use_sim_time": use_sim}],
     )
 
+    tcp_controller_spawner = Node(
+        package="controller_manager",
+        executable="spawner",
+        arguments=[LaunchConfiguration("tcp_controller")],
+        parameters=[{"use_sim_time": use_sim}],
+    )
+
     # Delay joint_state_broadcaster after controller_manager
     delay_jsb_spawner_after_controller_manager = RegisterEventHandler(
         event_handler=OnProcessStart(
@@ -69,13 +77,21 @@ def generate_launch_description() -> LaunchDescription:
         ),
     )
 
-    return LaunchDescription(
-        args
-        + [
-            controller_manager,
-            robot_state_publisher,
-            joint_state_broadcaster_spawner,
-            delay_jsb_spawner_after_controller_manager,
-            delay_robot_controller_spawners_after_jsb_spawner,
-        ]
+    # Delay start of tcp_controller after `joint_state_broadcaster`
+    delay_tcp_controller_spawners_after_jsb_spawner = RegisterEventHandler(
+        event_handler=OnProcessExit(
+            target_action=joint_state_broadcaster_spawner,
+            on_exit=[tcp_controller_spawner],
+        ),
     )
+
+    nodes = [
+        controller_manager,
+        robot_state_publisher,
+        joint_state_broadcaster_spawner,
+        delay_jsb_spawner_after_controller_manager,
+        delay_robot_controller_spawners_after_jsb_spawner,
+        delay_tcp_controller_spawners_after_jsb_spawner,
+    ]
+
+    return LaunchDescription(args + nodes)

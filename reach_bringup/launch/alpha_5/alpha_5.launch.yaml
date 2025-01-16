@@ -31,12 +31,12 @@ launch:
 
   - arg:
       name: rviz_config
-      default: $(find-pkg-share reach_description)/rviz/view_alpha.rviz
+      default: $(find-pkg-share reach_description)/rviz/alpha_5/view_alpha.rviz
       description: "The RViz configuration file."
 
   - arg:
       name: description_file
-      default: $(find-pkg-share reach_description)/description/alpha_5/standard_jaws.config.xacro
+      default: $(find-pkg-share reach_description)/description/alpha_5/standard_jaws/alpha_5.config.xacro
       description: "The robot description file."
 
   - arg:
@@ -55,6 +55,11 @@ launch:
       description: "The robot controller to use."
 
   - arg:
+      name: tcp_controller
+      default: tcp_position_controller
+      description: "The TCP controller to use."
+
+  - arg:
       name: gz_world_file
       default: "empty.sdf"
       description: "The Gazebo world file."
@@ -66,6 +71,8 @@ launch:
           value: $(var controllers_file)
         - name: robot_controller
           value: $(var robot_controller)
+        - name: tcp_controller
+          value: $(var tcp_controller)
         - name: use_sim
           value: $(var use_sim)
         - name: robot_description

@@ -1,9 +1,11 @@
 launch:
   - arg:
       name: model_name
+      description: "The model name, e.g., `alpha_5`."
 
   - arg:
       name: gz_world_file
+      description: "The Gazebo world file, e.g., `empty.sdf`."
 
   - node:
       pkg: ros_gz_bridge

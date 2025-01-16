@@ -1,11 +1,11 @@
 <?xml version="1.0"?>
-<robot name="alpha"
+<robot name="alpha_5"
        xmlns:xacro="http://ros.org/wiki/xacro">
 
   <!-- import main macros -->
   <xacro:include filename="$(find reach_description)/description/alpha_5/urdf.xacro" />
   <xacro:include filename="$(find reach_description)/description/alpha_5/ros2_control.xacro" />
-  <xacro:include filename="$(find reach_description)/description/alpha_5/end_effectors/standard_jaws.urdf.xacro" />
+  <xacro:include filename="$(find reach_description)/description/alpha_5/standard_jaws/standard_jaws.urdf.xacro" />
   <xacro:include filename="$(find reach_description)/description/alpha_5/gz.xacro" />
 
   <!-- parameters -->
@@ -44,7 +44,7 @@
   <!-- end effector -->
   <xacro:standard_jaws parent="${prefix}rs1_124_link"
                        prefix="${prefix}"
-                       axis_a="${prefix}axis_a">
+                       mimic_joint="${prefix}axis_a">
   </xacro:standard_jaws>
 
   <!-- ros2_control interface -->
@@ -54,6 +54,7 @@
                         use_sim="${use_sim}"
                         use_mock_hardware="$(arg use_mock_hardware)" />
 
+  <!-- gazebo configuration -->
   <xacro:if value="$(arg use_sim)">
     <xacro:alpha_5_gazebo prefix="${prefix}"
                           controllers_file="$(arg controllers_file)" />
