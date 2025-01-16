@@ -7,10 +7,12 @@ Robotics devices, including the Reach Alpha 5 and Reach Bravo 7 manipulators.
 
 The main features of this project include:
 
-- Integration of the Reach system communication protocol for hardware communication
+- Integration of the Reach system communication protocol for hardware
+  communication
 - ros2_control integration for manipulator position, velocity, and torque control
 - Visualization support using RViz2
-- Integration of the dynamic parameters obtained via system identification by Reach Robotics
+- Integration of the dynamic parameters obtained via system identification by
+  Reach Robotics
 
 ## Installation
 
@@ -29,6 +31,20 @@ replacing $ROS_DISTRO with the desired ROS distribution:
 ```bash
 rosdep update && \
 rosdep install -y --from-paths src --ignore-src --rosdistro $ROS_DISTRO
+```
+
+## Usage
+
+Run the following command to use the Reach Alpha 5 interface:
+
+```bash
+ros2 launch reach_bringup alpha_5.launch.yaml
+```
+
+A full description of the available arguments can be retrieved using
+
+```bash
+ros2 launch reach_bringup <launch-file-name> --show-args
 ```
 
 ## Disclaimer
