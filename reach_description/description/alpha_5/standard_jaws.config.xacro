@@ -6,6 +6,7 @@
   <xacro:include filename="$(find reach_description)/description/alpha_5/urdf.xacro" />
   <xacro:include filename="$(find reach_description)/description/alpha_5/ros2_control.xacro" />
   <xacro:include filename="$(find reach_description)/description/alpha_5/end_effectors/standard_jaws.urdf.xacro" />
+  <xacro:include filename="$(find reach_description)/description/alpha_5/gz.xacro" />
 
   <!-- parameters -->
   <xacro:arg name="use_mock_hardware"
@@ -18,6 +19,8 @@
              default="false" />
   <xacro:arg name="parent"
              default="world" />
+  <xacro:arg name="controllers_file"
+             default="$(find reach_description)/config/alpha_5/controllers.yaml" />
 
   <!-- initial positions used for simulation -->
   <xacro:arg name="initial_positions_file"
@@ -32,11 +35,11 @@
   <link name="world" />
 
   <!-- arm -->
-  <xacro:alpha_urdf parent="$(arg parent)"
-                    prefix="${prefix}">
+  <xacro:alpha_5_urdf parent="$(arg parent)"
+                      prefix="${prefix}">
     <origin xyz="0 0 0"
             rpy="0 0 0" />
-  </xacro:alpha_urdf>
+  </xacro:alpha_5_urdf>
 
   <!-- end effector -->
   <xacro:standard_jaws parent="${prefix}rs1_124_link"
@@ -45,10 +48,15 @@
   </xacro:standard_jaws>
 
   <!-- ros2_control interface -->
-  <xacro:alpha_system prefix="${prefix}"
-                      serial_port="$(arg serial_port)"
-                      initial_positions_file="$(arg initial_positions_file)"
-                      use_sim="${use_sim}"
-                      use_mock_hardware="$(arg use_mock_hardware)" />
+  <xacro:alpha_5_system prefix="${prefix}"
+                        serial_port="$(arg serial_port)"
+                        initial_positions_file="$(arg initial_positions_file)"
+                        use_sim="${use_sim}"
+                        use_mock_hardware="$(arg use_mock_hardware)" />
+
+  <xacro:if value="$(arg use_sim)">
+    <xacro:alpha_5_gazebo prefix="${prefix}"
+                          controllers_file="$(arg controllers_file)" />
+  </xacro:if>
 
 </robot>

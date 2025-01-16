@@ -59,10 +59,10 @@ const std::vector<std::string> STATE_INTERFACES{
   hardware_interface::HW_IF_EFFORT};
 
 /// Convert a torque (Nm) to current (mA) given the torque constant (Nm/A) and gear ratio
-auto convert_torque_to_current(float t, float Kt, float Gr) -> float { return t / Kt / Gr * 1000.0; }
+auto convert_torque_to_current(float τ, float Kt, float Gr) -> float { return τ / Kt / Gr * 1000.0; }
 
 /// Convert a current (mA) to torque (Nm) given the torque constant (Nm/A) and gear ratio
-auto convert_current_to_torque(float c, float Kt, float Gr) -> float { return c * Kt * Gr / 1000.0; }
+auto convert_current_to_torque(float I, float Kt, float Gr) -> float { return I * Kt * Gr / 1000.0; }
 
 /// Verify that the provided interfaces are the correct size and use a supported interface type
 auto validate_interfaces(

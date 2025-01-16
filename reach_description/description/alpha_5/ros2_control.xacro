@@ -1,9 +1,10 @@
 <?xml version="1.0"?>
 <robot xmlns:xacro="http://www.ros.org/wiki/xacro">
 
-  <xacro:macro name="alpha_system"
+  <xacro:macro name="alpha_5_system"
                params="prefix serial_port initial_positions_file use_sim:=^|false use_mock_hardware:=^true">
 
+    <!-- load the initial positions for simulation -->
     <xacro:property name="initial_positions_file"
                     default="$(arg initial_positions_file)" />
     <xacro:property name="initial_positions"
@@ -12,12 +13,14 @@
     <ros2_control name="ReachAlpha5"
                   type="system">
 
+      <!-- use the GazeboSimSystem for simulation -->
       <xacro:if value="$(arg use_sim)">
         <hardware>
           <plugin>gz_ros2_control/GazeboSimSystem</plugin>
         </hardware>
       </xacro:if>
 
+      <!-- use either the mock interface or real interface if not using simulation -->
       <xacro:unless value="$(arg use_sim)">
         <hardware>
           <xacro:if value="${use_mock_hardware}">
@@ -30,6 +33,8 @@
         </hardware>
       </xacro:unless>
 
+      <!-- joints -->
+      <!-- we need to include the device ID parameter for ros2_control -->
       <joint name="${prefix}axis_a">
         <param name="device_id">1</param>
         <command_interface name="position">
@@ -40,13 +45,16 @@
           <param name="min">-0.003</param>
           <param name="max">0.003</param>
         </command_interface>
+        <command_interface name="effort" />
         <state_interface name="position">
           <param name="initial_value">${initial_positions['axis_a']}</param>
         </state_interface>
         <state_interface name="velocity">
           <param name="initial_value">0.0</param>
         </state_interface>
-        <state_interface name="effort" />
+        <state_interface name="effort">
+          <param name="initial_value">0.0</param>
+        </state_interface>
       </joint>
 
       <joint name="${prefix}axis_b">
@@ -59,13 +67,16 @@
           <param name="min">-0.8726646</param>
           <param name="max">0.8726646</param>
         </command_interface>
+        <command_interface name="effort" />
         <state_interface name="position">
           <param name="initial_value">${initial_positions['axis_b']}</param>
         </state_interface>
         <state_interface name="velocity">
           <param name="initial_value">0.0</param>
         </state_interface>
-        <state_interface name="effort" />
+        <state_interface name="effort">
+          <param name="initial_value">0.0</param>
+        </state_interface>
       </joint>
 
       <joint name="${prefix}axis_c">
@@ -78,13 +89,16 @@
           <param name="min">-0.5235988</param>
           <param name="max">0.5235988</param>
         </command_interface>
+        <command_interface name="effort" />
         <state_interface name="position">
           <param name="initial_value">${initial_positions['axis_c']}</param>
         </state_interface>
         <state_interface name="velocity">
           <param name="initial_value">0.0</param>
         </state_interface>
-        <state_interface name="effort" />
+        <state_interface name="effort">
+          <param name="initial_value">0.0</param>
+        </state_interface>
       </joint>
 
       <joint name="${prefix}axis_d">
@@ -97,13 +111,16 @@
           <param name="min">-0.5235988</param>
           <param name="max">0.5235988</param>
         </command_interface>
+        <command_interface name="effort" />
         <state_interface name="position">
           <param name="initial_value">${initial_positions['axis_d']}</param>
         </state_interface>
         <state_interface name="velocity">
           <param name="initial_value">0.0</param>
         </state_interface>
-        <state_interface name="effort" />
+        <state_interface name="effort">
+          <param name="initial_value">0.0</param>
+        </state_interface>
       </joint>
 
       <joint name="${prefix}axis_e">
@@ -116,13 +133,16 @@
           <param name="min">-0.5235988</param>
           <param name="max">0.5235988</param>
         </command_interface>
+        <command_interface name="effort" />
         <state_interface name="position">
           <param name="initial_value">${initial_positions['axis_e']}</param>
         </state_interface>
         <state_interface name="velocity">
           <param name="initial_value">0.0</param>
         </state_interface>
-        <state_interface name="effort" />
+        <state_interface name="effort">
+          <param name="initial_value">0.0</param>
+        </state_interface>
       </joint>
 
     </ros2_control>

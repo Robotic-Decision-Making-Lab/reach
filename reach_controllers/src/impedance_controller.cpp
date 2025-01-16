@@ -307,5 +307,4 @@ auto ImpedanceController::update_and_write_commands(const rclcpp::Time & time, c
 }  // namespace reach::controllers
 
 #include "pluginlib/class_list_macros.hpp"
-
 PLUGINLIB_EXPORT_CLASS(reach::controllers::ImpedanceController, controller_interface::ChainableControllerInterface)

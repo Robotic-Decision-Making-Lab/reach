@@ -17,7 +17,7 @@ launch:
   - arg:
       name: use_sim
       default: "false"
-      description: "Use the Gazebo ros2_control hardware interface."
+      description: "Launch Gazebo."
 
   - arg:
       name: use_mock_hardware
@@ -46,7 +46,7 @@ launch:
 
   - arg:
       name: robot_description
-      default: $(command 'xacro $(var description_file) serial_port:=$(var serial_port) use_sim:=$(var use_sim) prefix:=$(var prefix) use_mock_hardware:=$(var use_mock_hardware) parent:=$(var parent_link)')
+      default: $(command 'xacro $(var description_file) serial_port:=$(var serial_port) use_sim:=$(var use_sim) prefix:=$(var prefix) use_mock_hardware:=$(var use_mock_hardware) parent:=$(var parent_link) controllers_file:=$(var controllers_file)')
       description: "The robot description."
 
   - arg:
@@ -54,8 +54,13 @@ launch:
       default: forward_position_controller
       description: "The robot controller to use."
 
+  - arg:
+      name: gz_world_file
+      default: "empty.sdf"
+      description: "The Gazebo world file."
+
   - include:
-      file: $(find-pkg-share reach_bringup)/launch/alpha_5/control.launch.py
+      file: $(find-pkg-share reach_bringup)/launch/control.launch.py
       arg:
         - name: controllers_file
           value: $(var controllers_file)
@@ -65,6 +70,15 @@ launch:
           value: $(var use_sim)
         - name: robot_description
           value: $(var robot_description)
+
+  - include:
+      file: $(find-pkg-share reach_bringup)/launch/gz.launch.yaml
+      if: $(var use_sim)
+      arg:
+        - name: model_name
+          value: alpha_5
+        - name: gz_world_file
+          value: $(var gz_world_file)
 
   - node:
       pkg: rviz2

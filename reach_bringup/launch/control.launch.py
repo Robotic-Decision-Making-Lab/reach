@@ -1,5 +1,6 @@
 from launch import LaunchDescription
 from launch.actions import DeclareLaunchArgument, RegisterEventHandler
+from launch.conditions import UnlessCondition
 from launch.event_handlers import OnProcessExit, OnProcessStart
 from launch.substitutions import LaunchConfiguration
 from launch_ros.actions import Node
@@ -13,46 +14,42 @@ def generate_launch_description() -> LaunchDescription:
         DeclareLaunchArgument("robot_description"),
     ]
 
-    controllers_file = LaunchConfiguration("controllers_file")
-    robot_controller = LaunchConfiguration("robot_controller")
     use_sim = LaunchConfiguration("use_sim")
-    robot_description = LaunchConfiguration("robot_description")
 
     controller_manager = Node(
         package="controller_manager",
         executable="ros2_control_node",
         output="both",
-        parameters=[controllers_file, {"use_sim_time": use_sim}],
+        parameters=[LaunchConfiguration("controllers_file"), {"use_sim_time": use_sim}],
         remappings=[
             ("/controller_manager/robot_description", "/robot_description"),
         ],
+        condition=UnlessCondition(use_sim),
     )
 
     robot_state_publisher = Node(
         package="robot_state_publisher",
         executable="robot_state_publisher",
         output="both",
-        parameters=[{"robot_description": robot_description, "use_sim_time": use_sim}],
+        parameters=[
+            {
+                "robot_description": LaunchConfiguration("robot_description"),
+                "use_sim_time": use_sim,
+            }
+        ],
     )
 
     joint_state_broadcaster_spawner = Node(
         package="controller_manager",
         executable="spawner",
-        arguments=[
-            "joint_state_broadcaster",
-            "--controller-manager",
-            "controller_manager",
-        ],
+        arguments=["joint_state_broadcaster"],
+        parameters=[{"use_sim_time": use_sim}],
     )
 
     robot_controller_spawner = Node(
         package="controller_manager",
         executable="spawner",
-        arguments=[
-            robot_controller,
-            "--controller-manager",
-            "controller_manager",
-        ],
+        arguments=[LaunchConfiguration("robot_controller")],
         parameters=[{"use_sim_time": use_sim}],
     )
 
@@ -77,6 +74,7 @@ def generate_launch_description() -> LaunchDescription:
         + [
             controller_manager,
             robot_state_publisher,
+            joint_state_broadcaster_spawner,
             delay_jsb_spawner_after_controller_manager,
             delay_robot_controller_spawners_after_jsb_spawner,
         ]
