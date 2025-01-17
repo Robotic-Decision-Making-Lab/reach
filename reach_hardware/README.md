@@ -34,7 +34,7 @@ reach_hardware/Alpha5Hardware
   * axis_d/effort
   * axis_e/effort
 
-[!NOTE]
+> [!NOTE]
 > Joint torques are calculated using the approximation $\tau \approx G_r K_t I$,
 > where $G_r$ is the joint gear ratio, $K_t$ is the joint torque constant, and
 > I is the measured joint current.
