@@ -60,7 +60,7 @@ reach_hardware/Alpha5Hardware
   * axis_d/effort
   * axis_e/effort
 
-[!NOTE]
+> [!NOTE]
 > Joint effort commands are converted into joint current commands using the
 > approximation $I \approx \frac{\tau}{G_r K_t}$, where $G_r$ is the joint gear
 > ratio, $K_t$ is the joint torque constant, and I is the measured joint
@@ -77,6 +77,6 @@ reach_hardware/Alpha5Hardware
 * serial_port: The manipulator serial port (e.g., /dev/ttyUSB0)
 * device_id: A given joint's device ID. This should be provided per joint.
 
-[!WARNING]
+> [!WARNING]
 > Prior to launching the Alpha 5 Hardware Interface, ensure that the serial
 > port has been given read/write permissions.
