@@ -12,8 +12,8 @@ velocity $\dot{q}_j$, the implemented control law is given as follows
 \tau_j^{\text{ref}} = \tau_j^{\text{ff}} + \mu_j^{\text{ff}} + \textbf{K}_p(q_j^{\text{ref}} - q_j) + \textbf{K}_d(\dot{q}_j^{\text{ref}} - \dot{q}_j),
 ```
 
-where $\tau_j^{\text{ff}}$ is a feedforward joint torque, \mu_j^{\text{ff}} is
-a feedforward joint friction term, $\textbf{K}_p$ is the desired joint
+where $\tau_j^{\text{ff}}$ is a feedforward joint torque, $\mu_j^{\text{ff}}$
+is a feedforward joint friction term, $\textbf{K}_p$ is the desired joint
 stiffness, and $\textbf{K}_d$ is the desired joint damping.
 
 This control law is commonly used as an inner controller in an MPC framework [^1] [^2].
@@ -54,6 +54,6 @@ The output of this controller is a desired joint torque $\tau_j^{\text{ref}}$ [N
 * joints: List of joints controlled by the impedance controller. [string array]
 * reference_names: The names of the reference controllers. This can be used to configure command interfaces in chained mode. [string array]
 * gains (provided per joint):
-  * friction: The joint friction. [double]
-  * stiffness: The desired joint stiffness. [double]
-  * damping: The desired joint damping. [double]
+  * friction: The joint friction $\mu_j^{\text{ff}}$. [double]
+  * stiffness: The desired joint stiffness $\textbf{K}_p$. [double]
+  * damping: The desired joint damping $\textbf{K}_d$. [double]
