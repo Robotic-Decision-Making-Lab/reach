@@ -12,9 +12,10 @@ velocity $\dot{q}_j$, the implemented control law is given as follows
 \tau_j^{\text{ref}} = \tau_j^{\text{ff}} + \mu_j^{\text{ff}} + \textbf{K}_p(q_j^{\text{ref}} - q_j) + \textbf{K}_d(\dot{q}_j^{\text{ref}} - \dot{q}_j),
 ```
 
-where $\tau_j^{\text{ff}}$ is a feedforward joint torque, $\mu_j^{\text{ff}}$
-is a feedforward joint friction term, $\textbf{K}_p$ is the desired joint
-stiffness, and $\textbf{K}_d$ is the desired joint damping.
+where $\tau_j^{\text{ff}}$ is a feedforward joint torque, $\textbf{K}_p$ is
+the desired joint stiffness, and $\textbf{K}_d$ is the desired joint damping.
+The Reach Robotics manipulators have a lot of joint friction. We use the
+feedforward friction term $\mu_j^{\text{ff}}$ to compensate for this.
 
 This control law is commonly used as an inner controller in an MPC framework [^1] [^2].
 
