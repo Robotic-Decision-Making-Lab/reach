@@ -9,28 +9,16 @@ each of the Reach Robotics devices.
 
 ### Examples
 
-* Launch the Reach Alpha 5 interface using mock hardware
-
-```bash
-ros2 launch reach_bringup alpha_5.launch.yaml
-```
-
 * Launch the Reach Alpha 5 interface using *real* hardware
 
 ```bash
-ros2 launch reach_bringup alpha_5.launch.yaml use_mock_hardware:=false
+ros2 launch reach_bringup alpha_5.launch.yaml use_mock_hardware:=false use_rviz:=true
 ```
 
 * Launch the Reach Alpha 5 interface in Gazebo
 
 ```bash
 ros2 launch reach_bringup alpha_5.launch.yaml use_sim:=true
-```
-
-* Launch the Reach Alpha 5 interface using RViz visualization
-
-```bash
-ros2 launch reach_bringup alpha_5.launch.yaml use_rviz:=true
 ```
 
 ## Micro IP Camera Launch
