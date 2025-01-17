@@ -77,6 +77,6 @@ reach_hardware/Alpha5Hardware
 * serial_port: The manipulator serial port (e.g., /dev/ttyUSB0)
 * device_id: A given joint's device ID. This should be provided per joint.
 
-[!CAUTION]
+[!WARNING]
 > Prior to launching the Alpha 5 Hardware Interface, ensure that the serial
 > port has been given read/write permissions.
