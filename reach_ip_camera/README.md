@@ -51,6 +51,10 @@ using
 ros2 launch reach_ip_camera gstreamer_proxy.launch.py
 ```
 
+> [!WARNING]
+> The ROS 2 interface should NOT be used to record a video feed. We recommend
+> using FFmpeg for recording video instead.
+
 ## Camera calibration
 
 The camera intrinsics can be retrieved using the [camera_calibration](https://docs.ros.org/en/rolling/p/camera_calibration/index.html)
