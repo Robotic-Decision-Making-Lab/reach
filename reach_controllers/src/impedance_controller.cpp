@@ -112,7 +112,7 @@ auto ImpedanceController::on_configure(const rclcpp_lifecycle::State & /*previou
   velocity_error_.resize(num_joints_, std::numeric_limits<double>::quiet_NaN());
 
   reference_sub_ = get_node()->create_subscription<reach_msgs::msg::MultiDOFImpedanceCommand>(
-    "multi_dof_impedance_command",
+    "~/multi_dof_impedance_command",
     rclcpp::SystemDefaultsQoS(),
     [this](const std::shared_ptr<reach_msgs::msg::MultiDOFImpedanceCommand>
              msg) {  // NOLINT(performance-unnecessary-value-param)
