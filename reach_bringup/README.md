@@ -11,15 +11,15 @@ each of the Reach Robotics devices.
 
 * Launch the Reach Alpha 5 interface using *real* hardware
 
-```bash
-ros2 launch reach_bringup alpha_5.launch.yaml use_mock_hardware:=false use_rviz:=true
-```
+  ```bash
+  ros2 launch reach_bringup alpha_5.launch.yaml use_mock_hardware:=false use_rviz:=true
+  ```
 
 * Launch the Reach Alpha 5 interface in Gazebo
 
-```bash
-ros2 launch reach_bringup alpha_5.launch.yaml use_sim:=true
-```
+  ```bash
+  ros2 launch reach_bringup alpha_5.launch.yaml use_sim:=true
+  ```
 
 ## Micro IP Camera Launch
 
@@ -30,9 +30,9 @@ ros2 launch reach_bringup alpha_5.launch.yaml use_sim:=true
 * Launch the Micro IP camera interface using the image_pipeline image
 rectification and debayer nodes
 
-```bash
-ros2 launch reach_bringup micro_ip.launch.py
-```
+  ```bash
+  ros2 launch reach_bringup micro_ip.launch.py
+  ```
 
 > [!NOTE]
 > We generally do not recommend using the Micro IP ROS 2 interface unless you
