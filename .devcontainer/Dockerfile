@@ -25,6 +25,34 @@ RUN apt-get -q update \
     && apt-get clean -y \
     && rm -rf /var/lib/apt/lists/*
 
+# Install GStreamer
+RUN apt-get -q update \
+    && apt-get -q -y upgrade \
+    && apt-get -q install --no-install-recommends -y \
+    gir1.2-gstreamer-1.0 \
+    libgstreamer1.0-dev \
+    libgstreamer-plugins-base1.0-dev \
+    libgstreamer-plugins-bad1.0-dev \
+    gstreamer1.0-plugins-base \
+    gstreamer1.0-plugins-good \
+    gstreamer1.0-plugins-bad \
+    gstreamer1.0-plugins-ugly \
+    gstreamer1.0-libav \
+    gstreamer1.0-tools \
+    gstreamer1.0-x \
+    gstreamer1.0-alsa \
+    gstreamer1.0-gl \
+    gstreamer1.0-gtk3 \
+    gstreamer1.0-qt5 \
+    gstreamer1.0-pulseaudio \
+    libcairo2-dev \
+    libgif-dev \
+    libjpeg-dev \
+    python3-pip \
+    && apt-get autoremove -y \
+    && apt-get clean -y \
+    && rm -rf /var/lib/apt/lists/*
+
 # Install all ROS dependencies needed for CI
 RUN apt-get -q update \
     && apt-get -q -y upgrade \

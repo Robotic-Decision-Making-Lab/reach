@@ -3,8 +3,9 @@
 
 # Except the following
 !reach_bringup
+!reach_controllers
 !reach_description
 !reach_hardware
-!reach_controllers
+!reach_ip_camera
 !reach_msgs
 !libreach
