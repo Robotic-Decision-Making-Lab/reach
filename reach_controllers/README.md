@@ -6,7 +6,7 @@ manipulators.
 ## Impedance Controller
 
 A chainable dynamic controller. Given a joint $j$ with position $q_j$ and
-velocity $\dot{q_j}$, the implemented control law is given as follows
+velocity $\dot{q}_j$, the implemented control law is given as follows
 
 ```math
 \tau_j^{\text{ref}} = \tau_j^{\text{ff}} \mu_j^{\text{ff}} + \textbf{K}_p(q_j^{\text{ref}} - q_j) + \textbf{K}_d(\dot{q}_j^{\text{ref}} - \dot{q}_j),
