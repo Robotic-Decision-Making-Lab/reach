@@ -48,7 +48,7 @@ the `reach_ip_camera` package, the node can be launched with [image_pipeline](ht
 using
 
 ```bash
-ros2 launch reach_ip_camera gstreamer_proxy.launch.py
+ros2 launch reach_bringup micro_ip.launch.py
 ```
 
 > [!WARNING]

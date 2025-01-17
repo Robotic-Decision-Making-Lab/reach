@@ -65,7 +65,7 @@ launch:
       description: "The Gazebo world file."
 
   - include:
-      file: $(find-pkg-share reach_bringup)/launch/control.launch.py
+      file: $(find-pkg-share reach_bringup)/launch/base.launch.py
       arg:
         - name: controllers_file
           value: $(var controllers_file)
@@ -75,25 +75,16 @@ launch:
           value: $(var tcp_controller)
         - name: use_sim
           value: $(var use_sim)
+        - name: use_rviz
+          value: $(var use_rviz)
         - name: robot_description
           value: $(var robot_description)
-
-  - include:
-      file: $(find-pkg-share reach_bringup)/launch/gz.launch.yaml
-      if: $(var use_sim)
-      arg:
-        - name: model_name
+        - name: gz_model_name
           value: alpha_5
         - name: gz_world_file
           value: $(var gz_world_file)
+        - name: rviz_config
+          value: $(var rviz_config)
 
-  - node:
-      pkg: rviz2
-      exec: rviz2
-      if: $(var use_rviz)
-      args: -d $(var rviz_config)
-      param:
-        - name: robot_description
-          value: $(var robot_description)
-        - name: use_sim_time
-          value: $(var use_sim)
+
+
