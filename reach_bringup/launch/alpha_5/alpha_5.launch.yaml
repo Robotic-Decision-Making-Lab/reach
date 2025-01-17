@@ -11,7 +11,7 @@ launch:
 
   - arg:
       name: use_rviz
-      default: "true"
+      default: "false"
       description: "Launch RViz."
 
   - arg:

@@ -88,7 +88,6 @@ def generate_launch_description() -> LaunchDescription:
     nodes = [
         controller_manager,
         robot_state_publisher,
-        joint_state_broadcaster_spawner,
         delay_jsb_spawner_after_controller_manager,
         delay_robot_controller_spawners_after_jsb_spawner,
         delay_tcp_controller_spawners_after_jsb_spawner,
