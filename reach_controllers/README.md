@@ -17,7 +17,7 @@ the desired joint stiffness, and $\textbf{K}_d$ is the desired joint damping.
 The Reach Robotics manipulators have a lot of joint friction. We use the
 feedforward friction term $\mu_j^{\text{ff}}$ to compensate for this.
 
-This control law is commonly used as an inner controller in an MPC framework [^1] [^2].
+This control law is commonly used as an inner controller in an MPC framework. [^1] [^2]
 
 [^1]: I. Dadiotis, A. Laurenzi, and N. Tsagarakis. "Whole-body MPC for highly redundant legged manipulators: experimental evaluation with a 37 DoF dual-arm quadruped," in *IEEE International Conference on Humanoid Robots (Humanoids)*, 2023.
 [^2]: J. -P. Sleiman, F. Farshidian, M. V. Minniti and M. Hutter, "A Unified MPC Framework for Whole-Body Dynamic Locomotion and Manipulation," in *IEEE Robotics and Automation Letters*, vol. 6, no. 3, pp. 4688-4695, July 2021.
