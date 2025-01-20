@@ -1,4 +1,4 @@
-# Reach Controllers
+# Reach Hardware Interfaces
 
 This package provides ros2_control hardware interfaces for the Reach Robotics
 manipulators.

@@ -11,7 +11,7 @@ The main features of this project include:
   communication
 - ros2_control integration for manipulator position, velocity, and torque
   control
-- ROS 2 support for the Reach Robotics [IP cameras](https://reachrobotics.com/products/underwater-rov-camera/)
+- ROS 2 support for the Reach Robotics IP cameras
 - Simulation support using Gazebo
 - Integration of the dynamic parameters obtained by Reach Robotics
 

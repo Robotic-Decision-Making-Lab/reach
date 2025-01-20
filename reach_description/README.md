@@ -1,6 +1,6 @@
 # Reach Description
 
-This package contains the various description files for Reach Robotics devices.
+This package contains description files for Reach Robotics devices.
 
 ## Configurations
 
