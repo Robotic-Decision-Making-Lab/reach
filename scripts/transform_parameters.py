@@ -24,7 +24,8 @@
 # WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 """
-A utility script used to transform parameters defined in the datasheet to ROS conventions.
+A utility script used to transform parameters defined in the datasheet to ROS
+conventions.
 """
 
 from argparse import ArgumentParser, Namespace
