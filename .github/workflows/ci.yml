@@ -30,7 +30,7 @@ jobs:
           ROS_DISTRO: ${{ matrix.env.ROS_DISTRO }}
           CXXFLAGS: -Wall -Wextra -Wpedantic
           CLANG_TIDY: true
-          AFTER_SETUP_UPSTREAM_WORKSPACE: \
+          AFTER_SETUP_TARGET_WORKSPACE: \
             sudo apt-get update && \
             sudo apt-get install -y \
               gir1.2-gstreamer-1.0 \

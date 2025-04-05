@@ -53,16 +53,6 @@ RUN apt-get -q update \
     && apt-get clean -y \
     && rm -rf /var/lib/apt/lists/*
 
-# Install all ROS dependencies needed for CI
-RUN apt-get -q update \
-    && apt-get -q -y upgrade \
-    && rosdep update \
-    && rosdep install -y --from-paths src --ignore-src --rosdistro ${ROS_DISTRO} --as-root=apt:false \
-    && rm -rf src \
-    && apt-get autoremove -y \
-    && apt-get clean -y \
-    && rm -rf /var/lib/apt/lists/*
-
 # Configure the ubuntu non-root user
 ARG USERNAME=ubuntu
 ARG USER_UID=1000
@@ -122,8 +112,7 @@ RUN sudo apt-get -q update \
 
 # Install debugging/linting Python packages
 RUN pip install \
-    pre-commit \
-    mypy
+    pre-commit
 
 # Install debugging/linting C++ packages
 RUN sudo apt-get -q update \
