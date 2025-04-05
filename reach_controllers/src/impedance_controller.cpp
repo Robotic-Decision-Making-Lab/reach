@@ -250,7 +250,12 @@ auto ImpedanceController::update_system_state_values() -> controller_interface::
 {
   for (std::size_t i = 0; i < REQUIRED_STATE_INTERFACES.size(); ++i) {
     for (std::size_t j = 0; j < num_joints_; ++j) {
-      system_state_values_[i * num_joints_ + j] = state_interfaces_[i * num_joints_ + j].get_value();
+      const auto out = state_interfaces_[i * num_joints_ + j].get_optional();
+      if (!out.has_value()) {
+        std::cerr << "Failed to get state interface value for joint " << joint_names_[j] << "\n";
+        return controller_interface::return_type::ERROR;
+      }
+      system_state_values_[i * num_joints_ + j] = out.value();
     }
   }
 
@@ -292,10 +297,15 @@ auto ImpedanceController::update_and_write_commands(const rclcpp::Time & time, c
       rt_controller_state_pub_->msg_.torques[i] = reference_interfaces_[2 * num_joints_ + i];
       rt_controller_state_pub_->msg_.position_errors[i] = position_error_[i];
       rt_controller_state_pub_->msg_.velocity_errors[i] = velocity_error_[i];
-      rt_controller_state_pub_->msg_.outputs[i] = command_interfaces_[i].get_value();
       rt_controller_state_pub_->msg_.p_terms[i] = controller_gains_[i].damping;
       rt_controller_state_pub_->msg_.d_terms[i] = controller_gains_[i].stiffness;
       rt_controller_state_pub_->msg_.friction_terms[i] = controller_gains_[i].friction;
+      const auto out = command_interfaces_[i].get_optional();
+      if (!out.has_value()) {
+        std::cerr << "Failed to get command interface value for joint " << joint_names_[i] << "\n";
+        return controller_interface::return_type::ERROR;
+      }
+      rt_controller_state_pub_->msg_.outputs[i] = out.value();
     }
 
     rt_controller_state_pub_->unlockAndPublish();

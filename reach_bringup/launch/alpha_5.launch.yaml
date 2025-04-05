@@ -85,6 +85,3 @@ launch:
           value: $(var gz_world_file)
         - name: rviz_config
           value: $(var rviz_config)
-
-
-
