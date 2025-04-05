@@ -63,3 +63,5 @@ CheckOptions:
     value: UPPER_CASE
   - key:   readability-identifier-naming.ClassConstantCase
     value: UPPER_CASE
+  - key: modernize-use-override.IgnoreDestructors
+    value: "true"

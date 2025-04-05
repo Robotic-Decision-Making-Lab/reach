@@ -159,7 +159,7 @@ auto decode_packets(const std::vector<std::uint8_t> & data) -> std::vector<Packe
       const Packet packet = decode_packet(packet_data);
       packets.push_back(packet);
     }
-    catch (const std::exception & e) {
+    catch (const std::exception & e) {  // NOLINT(bugprone-empty-catch)
       // TODO(evan-palmer): Right now the logging spams the console with errors. This should be refactored when
       // std::expected is integrated.
     }
