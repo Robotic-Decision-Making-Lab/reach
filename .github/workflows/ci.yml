@@ -31,8 +31,8 @@ jobs:
           CXXFLAGS: -Wall -Wextra -Wpedantic
           CLANG_TIDY: true
           AFTER_SETUP_TARGET_WORKSPACE: \
-            sudo apt-get update && \
-            sudo apt-get install -y \
+            apt-get update && \
+            apt-get install -y \
               gir1.2-gstreamer-1.0 \
               libgstreamer1.0-dev \
               libgstreamer-plugins-base1.0-dev \
