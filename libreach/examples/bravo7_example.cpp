@@ -1,4 +1,4 @@
-// Copyright (c) 2024 Evan Palmer
+// Copyright (c) 2025 Evan Palmer
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy of
 // this software and associated documentation files (the "Software"), limited
@@ -31,6 +31,8 @@
 #include "libreach/packet_id.hpp"
 #include "libreach/udp_driver.hpp"
 
+using namespace std::chrono_literals;
+
 /// This example demonstrates how to use the UDP driver to communicate with a Bravo 7 manipulator.
 auto main() -> int
 {
@@ -47,15 +49,10 @@ auto main() -> int
   });
 
   // Request POSITION data at 10 Hz from joint A
-  driver.request_at_rate(
-    libreach::PacketId::POSITION,
-    std::to_underlying(libreach::Bravo7DeviceId::JOINT_A),
-    std::chrono::milliseconds(100));
+  driver.request_at_rate(libreach::PacketId::POSITION, std::to_underlying(libreach::Bravo7DeviceId::JOINT_A), 100ms);
 
   // Let the driver run indefinitely
   while (true) {
-    std::this_thread::sleep_for(std::chrono::seconds(1));
+    std::this_thread::sleep_for(1s);
   }
-
-  return 0;
 }

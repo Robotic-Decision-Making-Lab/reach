@@ -4,7 +4,6 @@ FROM ros:$ROS_DISTRO-ros-base AS base
 ENV DEBIAN_FRONTEND=noninteractive
 WORKDIR /root/ws_ros
 
-# Update to be your project's name
 ENV PROJECT_NAME=reach
 
 COPY . src/$PROJECT_NAME

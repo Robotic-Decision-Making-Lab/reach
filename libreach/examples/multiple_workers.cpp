@@ -1,4 +1,4 @@
-// Copyright (c) 2024 Evan Palmer
+// Copyright (c) 2025 Evan Palmer
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy of
 // this software and associated documentation files (the "Software"), limited
@@ -32,6 +32,8 @@
 #include "libreach/packet_id.hpp"
 #include "libreach/serial_driver.hpp"
 
+using namespace std::chrono_literals;
+
 /// This example demonstrates how to configure multiple worker threads for processing incoming packets. A multi-worker
 /// configuration can be helpful when processing a large number of packets or when callbacks are computationally
 /// expensive.
@@ -64,7 +66,7 @@ auto main() -> int
 
   // Request position data at 100 Hz for each joint
   for (std::size_t i = 1; i <= 5; ++i) {
-    driver.request_at_rate(libreach::PacketId::POSITION, static_cast<std::uint8_t>(i), std::chrono::milliseconds(10));
+    driver.request_at_rate(libreach::PacketId::POSITION, static_cast<std::uint8_t>(i), 10ms);
   }
 
   // Print out the joint positions
@@ -77,8 +79,6 @@ auto main() -> int
       std::cout << "=========================\n";
     }
 
-    std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    std::this_thread::sleep_for(100ms);
   }
-
-  return 0;
 }

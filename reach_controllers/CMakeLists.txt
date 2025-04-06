@@ -37,10 +37,7 @@ target_sources(
 )
 target_compile_features(reach_controllers PUBLIC cxx_std_20)
 target_link_libraries(reach_controllers PUBLIC impedance_controller_parameters)
-ament_target_dependencies(reach_controllers
-  PUBLIC
-    ${THIS_PACKAGE_INCLUDE_DEPENDS}
-)
+ament_target_dependencies(reach_controllers PUBLIC ${THIS_PACKAGE_INCLUDE_DEPENDS})
 
 pluginlib_export_plugin_description_file(controller_interface reach_controllers.xml)
 

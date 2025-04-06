@@ -1,4 +1,4 @@
-// Copyright (c) 2024 Evan Palmer
+// Copyright (c) 2025 Evan Palmer
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy of
 // this software and associated documentation files (the "Software"), limited
@@ -31,6 +31,8 @@
 #include "libreach/packet_id.hpp"
 #include "libreach/serial_driver.hpp"
 
+using namespace std::chrono_literals;
+
 // This example demonstrates the different approaches to sending packets to a robot using libreach.
 // WARNING: This will set the joint position of joint A. Verify that the joint is clear of obstacles before running.
 auto main() -> int
@@ -59,8 +61,6 @@ auto main() -> int
 
   // Let the driver run indefinitely
   while (true) {
-    std::this_thread::sleep_for(std::chrono::seconds(1));
+    std::this_thread::sleep_for(1s);
   }
-
-  return 0;
 }

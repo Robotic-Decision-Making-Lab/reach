@@ -1,4 +1,4 @@
-// Copyright (c) 2024 Evan Palmer
+// Copyright (c) 2025 Evan Palmer
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy of
 // this software and associated documentation files (the "Software"), limited
@@ -29,6 +29,8 @@
 #include <ranges>
 #include <stdexcept>
 #include <utility>
+
+#include "libreach/version.hpp"
 
 namespace libreach
 {
@@ -335,6 +337,8 @@ auto ReachDriver::send_packet(PacketId packet_id, std::uint8_t device_id, const 
 {
   send_packet(Packet(packet_id, device_id, data));
 }
+
+auto ReachDriver::api_version() const -> std::string { return {REACH_PROTOCOL_VERSION}; }
 
 auto ReachDriver::receive_packet(const Packet & packet) -> void
 {

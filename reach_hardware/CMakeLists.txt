@@ -31,7 +31,7 @@ target_sources(
             ${CMAKE_CURRENT_SOURCE_DIR}/include/reach_hardware/alpha_5_hardware.hpp
 )
 target_compile_features(reach_hardware PUBLIC cxx_std_20)
-ament_target_dependencies(reach_hardware ${THIS_PACKAGE_INCLUDE_DEPENDS})
+ament_target_dependencies(reach_hardware PUBLIC ${THIS_PACKAGE_INCLUDE_DEPENDS})
 
 pluginlib_export_plugin_description_file(hardware_interface alpha_5_hardware.xml)
 

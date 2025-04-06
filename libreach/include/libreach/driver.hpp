@@ -1,4 +1,4 @@
-// Copyright (c) 2024 Evan Palmer
+// Copyright (c) 2025 Evan Palmer
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy of
 // this software and associated documentation files (the "Software"), limited
@@ -205,6 +205,9 @@ public:
 
   /// Send a packet using the configured client.
   auto send_packet(PacketId packet_id, std::uint8_t device_id, const std::vector<std::uint8_t> & data) const -> void;
+
+  /// Get the Reach Serial Protocol version.
+  auto api_version() const -> std::string;
 
 protected:
   ~ReachDriver();

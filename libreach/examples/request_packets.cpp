@@ -1,4 +1,4 @@
-// Copyright (c) 2024 Evan Palmer
+// Copyright (c) 2025 Evan Palmer
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy of
 // this software and associated documentation files (the "Software"), limited
@@ -31,6 +31,8 @@
 #include "libreach/packet_id.hpp"
 #include "libreach/serial_driver.hpp"
 
+using namespace std::chrono_literals;
+
 /// This example demonstrates the different approaches that can be taken to request data from a manipulator.
 auto main() -> int
 {
@@ -54,16 +56,13 @@ auto main() -> int
   // manually request that data on our own.
 
   // Request a POSITION packet from joint A at a rate of 10 Hz (every 100 ms)
-  driver.request_at_rate(
-    libreach::PacketId::POSITION,
-    std::to_underlying(libreach::Alpha5DeviceId::JOINT_A),
-    std::chrono::milliseconds(100));
+  driver.request_at_rate(libreach::PacketId::POSITION, std::to_underlying(libreach::Alpha5DeviceId::JOINT_A), 100ms);
 
   // Request VELOCITY and CURRENT packets from joint B at a rate of 5 Hz (every 200 ms)
   driver.request_at_rate(
     {libreach::PacketId::VELOCITY, libreach::PacketId::CURRENT},
     std::to_underlying(libreach::Alpha5DeviceId::JOINT_B),
-    std::chrono::milliseconds(200));
+    200ms);
 
   // The `request` interface is designed for one-time requests for data (e.g., for current configurations) and can be
   // used either synchronously or asynchronously.
@@ -82,8 +81,6 @@ auto main() -> int
             << "\n\r z: " << pose[2] << "\n";
 
   while (true) {
-    std::this_thread::sleep_for(std::chrono::seconds(1));
+    std::this_thread::sleep_for(1s);
   }
-
-  return 0;
 }
