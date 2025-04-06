@@ -338,7 +338,7 @@ auto ReachDriver::send_packet(PacketId packet_id, std::uint8_t device_id, const 
   send_packet(Packet(packet_id, device_id, data));
 }
 
-auto ReachDriver::api_version() const -> std::string { return {REACH_PROTOCOL_VERSION}; }
+auto ReachDriver::api_version() -> std::string { return {REACH_PROTOCOL_VERSION}; }
 
 auto ReachDriver::receive_packet(const Packet & packet) -> void
 {

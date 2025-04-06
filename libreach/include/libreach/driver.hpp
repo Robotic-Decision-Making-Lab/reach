@@ -207,7 +207,7 @@ public:
   auto send_packet(PacketId packet_id, std::uint8_t device_id, const std::vector<std::uint8_t> & data) const -> void;
 
   /// Get the Reach Serial Protocol version.
-  auto api_version() const -> std::string;
+  static auto api_version() -> std::string;
 
 protected:
   ~ReachDriver();
