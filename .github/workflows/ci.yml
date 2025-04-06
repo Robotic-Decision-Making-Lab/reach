@@ -19,26 +19,15 @@ jobs:
       fail-fast: false
       matrix:
         env:
-          - IMAGE: jazzy-ci
-            ROS_DISTRO: jazzy
+          - ROS_DISTRO: rolling
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-        with:
-          submodules: recursive
-
-      - name: Log into registry
-        uses: docker/login-action@v3.3.0
-        with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Run ROS Industrial CI
         uses: ros-industrial/industrial_ci@master
         env:
-          DOCKER_IMAGE: ghcr.io/robotic-decision-making-lab/reach:${{ matrix.env.IMAGE }}
-          CXXFLAGS: >-
-            -Wall -Wextra -Wpedantic -Wwrite-strings -Wunreachable-code -Wpointer-arith -Wredundant-decls
-          CC: ${{ env.CLANG_TIDY && 'clang' }}
-          CXX: ${{ env.CLANG_TIDY && 'clang++' }}
+          ROS_DISTRO: ${{ matrix.env.ROS_DISTRO }}
+          CXXFLAGS: -Wall -Wextra -Wpedantic
+          CLANG_TIDY: true
+          ADDITIONAL_DEBS: gir1.2-gstreamer-1.0 libgstreamer1.0-dev libgstreamer-plugins-base1.0-dev libgstreamer-plugins-bad1.0-dev gstreamer1.0-plugins-base gstreamer1.0-plugins-good gstreamer1.0-plugins-bad gstreamer1.0-plugins-ugly gstreamer1.0-libav gstreamer1.0-tools gstreamer1.0-x gstreamer1.0-alsa gstreamer1.0-gl gstreamer1.0-gtk3 gstreamer1.0-qt5 gstreamer1.0-pulseaudio

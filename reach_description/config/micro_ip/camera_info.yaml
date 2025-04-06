@@ -1,0 +1,21 @@
+#! UNCALIBRATED - DO NOT USE THESE
+image_width: 640
+image_height: 360
+camera_name: micro_ip
+camera_matrix:
+  rows: 3
+  cols: 3
+  data: [2400.4383583091117, 0.0, 1529.4012146646958, 0.0, 2136.135597065813, 943.4742309443175, 0.0, 0.0, 1.0]
+distortion_model: plumb_bob
+distortion_coefficients:
+  rows: 1
+  cols: 5
+  data: [-0.3288060379090557, 0.15384372296290905, 0.0009598397832517386, -0.00015926806765167236, 0.0]
+rectification_matrix:
+  rows: 3
+  cols: 3
+  data: [1.000000, 0.000000, 0.000000, 0.000000, 1.000000, 0.000000, 0.000000, 0.000000, 1.000000]
+projection_matrix:
+  rows: 3
+  cols: 4
+  data: [2078.5634765625, 0.0, 1526.4495132139418, 0.0, 0.0, 1967.0264892578125, 931.5414791624717, 0.0, 0.0, 0.0, 1.0, 0.0]

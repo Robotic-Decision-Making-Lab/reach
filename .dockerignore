@@ -2,6 +2,10 @@
 *
 
 # Except the following
-!example_pkg
-
-!ros2.repos
+!reach_bringup
+!reach_controllers
+!reach_description
+!reach_hardware
+!reach_ip_camera
+!reach_msgs
+!libreach

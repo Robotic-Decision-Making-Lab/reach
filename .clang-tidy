@@ -13,8 +13,6 @@ Checks: >
   -google-readability-namespace-comments,
   -google-runtime-references,
   -misc-non-private-member-variables-in-classes,
-  -modernize-return-braced-init-list,
-  -modernize-use-trailing-return-type,
   -readability-braces-around-statements,
   -readability-identifier-length,
   -readability-magic-numbers,
@@ -65,3 +63,5 @@ CheckOptions:
     value: UPPER_CASE
   - key:   readability-identifier-naming.ClassConstantCase
     value: UPPER_CASE
+  - key: modernize-use-override.IgnoreDestructors
+    value: "true"

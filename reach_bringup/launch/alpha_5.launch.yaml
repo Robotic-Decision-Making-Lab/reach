@@ -1,0 +1,87 @@
+launch:
+  - arg:
+      name: prefix
+      default: ""
+      description: "The prefix used in the robot description. This should be provided in the form `<prefix>/`."
+
+  - arg:
+      name: serial_port
+      default: /dev/ttyUSB0
+      description: "The serial port used to communicate with the robot, e.g., `/dev/ttyUSB0`."
+
+  - arg:
+      name: use_rviz
+      default: "false"
+      description: "Launch RViz."
+
+  - arg:
+      name: use_sim
+      default: "false"
+      description: "Launch Gazebo."
+
+  - arg:
+      name: use_mock_hardware
+      default: "true"
+      description: "Use the mock hardware interface. This is not used if `use_sim` is true."
+
+  - arg:
+      name: parent_link
+      default: world
+      description: "The parent link of the robot. This is useful for affixing the Alpha 5 to another robot."
+
+  - arg:
+      name: rviz_config
+      default: $(find-pkg-share reach_description)/rviz/alpha_5/view_alpha.rviz
+      description: "The RViz configuration file."
+
+  - arg:
+      name: description_file
+      default: $(find-pkg-share reach_description)/description/alpha_5/standard_jaws/alpha_5.config.xacro
+      description: "The robot description file."
+
+  - arg:
+      name: controllers_file
+      default: $(find-pkg-share reach_description)/config/alpha_5/controllers.yaml
+      description: "The ros2_control controllers configuration file."
+
+  - arg:
+      name: robot_description
+      default: $(command 'xacro $(var description_file) serial_port:=$(var serial_port) use_sim:=$(var use_sim) prefix:=$(var prefix) use_mock_hardware:=$(var use_mock_hardware) parent:=$(var parent_link) controllers_file:=$(var controllers_file)')
+      description: "The robot description."
+
+  - arg:
+      name: robot_controller
+      default: forward_position_controller
+      description: "The robot controller to use."
+
+  - arg:
+      name: tcp_controller
+      default: tcp_position_controller
+      description: "The TCP controller to use."
+
+  - arg:
+      name: gz_world_file
+      default: "empty.sdf"
+      description: "The Gazebo world file."
+
+  - include:
+      file: $(find-pkg-share reach_bringup)/launch/base.launch.py
+      arg:
+        - name: controllers_file
+          value: $(var controllers_file)
+        - name: robot_controller
+          value: $(var robot_controller)
+        - name: tcp_controller
+          value: $(var tcp_controller)
+        - name: use_sim
+          value: $(var use_sim)
+        - name: use_rviz
+          value: $(var use_rviz)
+        - name: robot_description
+          value: $(var robot_description)
+        - name: gz_model_name
+          value: alpha_5
+        - name: gz_world_file
+          value: $(var gz_world_file)
+        - name: rviz_config
+          value: $(var rviz_config)

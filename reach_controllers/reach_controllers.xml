@@ -1,0 +1,11 @@
+<library path="reach_controllers">
+
+  <class name="reach_controllers/ImpedanceController"
+         type="reach::controllers::ImpedanceController"
+         base_class_type="controller_interface::ChainableControllerInterface">
+    <description>
+      Impedance controller for Reach Robotics devices
+    </description>
+  </class>
+
+</library>

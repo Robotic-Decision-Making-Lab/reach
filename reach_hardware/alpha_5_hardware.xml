@@ -1,0 +1,10 @@
+<library path="reach_hardware">
+  <class name="reach_hardware/Alpha5Hardware"
+         type="reach::hardware::Alpha5Hardware"
+         base_class_type="hardware_interface::SystemInterface">
+    <description>
+      Reach Alpha 5 manipulator plugin for ros2_control using a system hardware
+      interface-type.
+    </description>
+  </class>
+</library>

@@ -1,0 +1,63 @@
+<?xml version="1.0"?>
+<robot name="alpha_5"
+       xmlns:xacro="http://ros.org/wiki/xacro">
+
+  <!-- import main macros -->
+  <xacro:include filename="$(find reach_description)/description/alpha_5/urdf.xacro" />
+  <xacro:include filename="$(find reach_description)/description/alpha_5/ros2_control.xacro" />
+  <xacro:include filename="$(find reach_description)/description/alpha_5/standard_jaws/standard_jaws.urdf.xacro" />
+  <xacro:include filename="$(find reach_description)/description/alpha_5/gz.xacro" />
+
+  <!-- parameters -->
+  <xacro:arg name="use_mock_hardware"
+             default="true" />
+  <xacro:arg name="serial_port"
+             default="" />
+  <xacro:arg name="prefix"
+             default="" />
+  <xacro:arg name="use_sim"
+             default="false" />
+  <xacro:arg name="parent"
+             default="world" />
+  <xacro:arg name="controllers_file"
+             default="$(find reach_description)/config/alpha_5/controllers.yaml" />
+
+  <!-- initial positions used for simulation -->
+  <xacro:arg name="initial_positions_file"
+             default="$(find reach_description)/config/alpha_5/initial_positions.yaml" />
+
+  <xacro:property name="prefix"
+                  value="$(arg prefix)" />
+  <xacro:property name="use_sim"
+                  value="$(arg use_sim)" />
+
+  <!-- create link fixed to the "world" -->
+  <link name="world" />
+
+  <!-- arm -->
+  <xacro:alpha_5_urdf parent="$(arg parent)"
+                      prefix="${prefix}">
+    <origin xyz="0 0 0"
+            rpy="0 0 0" />
+  </xacro:alpha_5_urdf>
+
+  <!-- end effector -->
+  <xacro:standard_jaws parent="${prefix}rs1_124_link"
+                       prefix="${prefix}"
+                       mimic_joint="${prefix}axis_a">
+  </xacro:standard_jaws>
+
+  <!-- ros2_control interface -->
+  <xacro:alpha_5_system prefix="${prefix}"
+                        serial_port="$(arg serial_port)"
+                        initial_positions_file="$(arg initial_positions_file)"
+                        use_sim="${use_sim}"
+                        use_mock_hardware="$(arg use_mock_hardware)" />
+
+  <!-- gazebo configuration -->
+  <xacro:if value="$(arg use_sim)">
+    <xacro:alpha_5_gazebo prefix="${prefix}"
+                          controllers_file="$(arg controllers_file)" />
+  </xacro:if>
+
+</robot>

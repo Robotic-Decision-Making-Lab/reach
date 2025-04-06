@@ -1,0 +1,30 @@
+<?xml version="1.0"?>
+<?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
+<package format="3">
+
+  <name>reach_ip_camera</name>
+  <version>0.0.1</version>
+  <description>A light wrapper around GStreamer to convert the IP camera stream into a ROS 2 feed</description>
+
+  <maintainer email="evanp922@gmail.com">Evan Palmer</maintainer>
+  <license>MIT</license>
+
+  <url type="repository">https://github.com/Robotic-Decision-Making-Lab/reach.git</url>
+  <url type="bugtracker">https://github.com/Robotic-Decision-Making-Lab/reach/issues</url>
+
+  <author>Evan Palmer</author>
+
+  <depend>generate_parameter_library</depend>
+  <depend>sensor_msgs</depend>
+  <depend>rclcpp_components</depend>
+  <depend>cv_bridge</depend>
+  <depend>camera_info_manager</depend>
+  <depend>image_transport</depend>
+
+  <exec_depend>image_proc</exec_depend>
+  <exec_depend>camera_calibration</exec_depend>
+
+  <export>
+    <build_type>ament_cmake</build_type>
+  </export>
+</package>

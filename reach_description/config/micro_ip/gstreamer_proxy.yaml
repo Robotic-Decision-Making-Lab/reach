@@ -1,0 +1,21 @@
+/micro_ip/gstreamer_proxy:
+  ros__parameters:
+    # The default RTSP stream address for the Reach Robotics Micro IP camera.
+    # If using MediaMTX, this should be the address of the MediaMTX server, e.g.,
+    # stream_address: rtsp://192.168.1.10:8554/micro_ip
+    stream_address: rtsp://admin:@192.168.2.10:554/stream=1
+
+    # The path to the camera info file. This file contains the camera calibration information.
+    camera_info_url: package://reach_description/config/micro_ip/camera_info.yaml
+
+    # The frame ID of the camera.
+    frame_id: camera_link
+
+    # The default width of the camera image.
+    image_width: 3072
+
+    # The default height of the camera image.
+    image_height: 2048
+
+    # The name of the camera.
+    camera_name: micro_ip
