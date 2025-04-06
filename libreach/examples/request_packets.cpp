@@ -83,4 +83,6 @@ auto main() -> int
   while (true) {
     std::this_thread::sleep_for(1s);
   }
+
+  return 0;
 }

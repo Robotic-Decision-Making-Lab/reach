@@ -81,4 +81,6 @@ auto main() -> int
 
     std::this_thread::sleep_for(100ms);
   }
+
+  return 0;
 }
