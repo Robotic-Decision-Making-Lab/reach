@@ -41,7 +41,7 @@ def generate_launch_description() -> LaunchDescription:
         package="rviz2",
         executable="rviz2",
         arguments=["-d", LaunchConfiguration("rviz_config")],
-        parameters=[robot_description, {"use_sim_time": use_sim}],
+        parameters=[{"use_sim_time": use_sim}],
         condition=IfCondition(LaunchConfiguration("use_rviz")),
     )
 
