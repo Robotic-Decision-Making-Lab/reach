@@ -258,11 +258,11 @@ auto Alpha5Hardware::read(const rclcpp::Time & /* time */, const rclcpp::Duratio
 
   for (const auto & [name, desc] : joint_state_interfaces_) {
     if (desc.interface_info.name == hardware_interface::HW_IF_POSITION) {
-      set_state(name, async_states_positions_[desc.prefix_name]);
+      set_state(name, static_cast<double>(async_states_positions_[desc.prefix_name]));
     } else if (desc.interface_info.name == hardware_interface::HW_IF_VELOCITY) {
-      set_state(name, async_states_velocities_[desc.prefix_name]);
+      set_state(name, static_cast<double>(async_states_velocities_[desc.prefix_name]));
     } else if (desc.interface_info.name == hardware_interface::HW_IF_EFFORT) {
-      set_state(name, async_states_efforts_[desc.prefix_name]);
+      set_state(name, static_cast<double>(async_states_efforts_[desc.prefix_name]));
     }
   }
 
