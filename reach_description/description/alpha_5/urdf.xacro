@@ -2,7 +2,14 @@
 <robot xmlns:xacro="http://ros.org/wiki/xacro">
 
   <xacro:macro name="alpha_5_urdf"
-               params="parent prefix *origin mount_rotation:=^0">
+               params="parent prefix *origin joint_limits_file mount_rotation:=^0">
+
+    <!-- dynamically load the joint limits from a configuration file -->
+    <!-- this lets us modify a configuration file instead of requiring the implementation of a new URDF -->
+    <xacro:property name="joint_limits_file"
+                    default="$(arg joint_limits_file)" />
+    <xacro:property name="joint_limits"
+                    value="${xacro.load_yaml(joint_limits_file)['joint_limits']}" />
 
     <!-- links -->
     <!-- the distance from the mount center to the base_link is xyz="0.0374 0 0.0225" -->
@@ -261,8 +268,8 @@
       <origin xyz="0 0 0.014" />
       <axis xyz="0 0 1" />
       <limit effort="9.0"
-             lower="0.0"
-             upper="6.10"
+             lower="${joint_limits['axis_e']['min_position']}"
+             upper="${joint_limits['axis_e']['max_position']}"
              velocity="0.5" />
     </joint>
 
@@ -273,8 +280,8 @@
       <origin xyz="-0.02 0 0.033" />
       <axis xyz="0 1 0" />
       <limit effort="9.0"
-             lower="-3.49"
-             upper="3.49"
+             lower="${joint_limits['axis_d']['min_position']}"
+             upper="${joint_limits['axis_d']['max_position']}"
              velocity="0.5" />
     </joint>
 
@@ -286,8 +293,8 @@
               rpy="0 0 3.14159" />
       <axis xyz="0 1 0" />
       <limit effort="9.0"
-             lower="0.0"
-             upper="3.22"
+             lower="${joint_limits['axis_c']['min_position']}"
+             upper="${joint_limits['axis_c']['max_position']}"
              velocity="0.5" />
     </joint>
 
@@ -299,8 +306,8 @@
               rpy="0 0 2.09439" />
       <axis xyz="0 0 -1" />
       <limit effort="9.0"
-             lower="0.0"
-             upper="3.22"
+             lower="${joint_limits['axis_b']['min_position']}"
+             upper="${joint_limits['axis_b']['max_position']}"
              velocity="0.5" />
     </joint>
 
@@ -320,8 +327,8 @@
       <child link="${prefix}push_rod" />
       <axis xyz="0 0 1" />
       <limit effort="10"
-             lower="0"
-             upper="0.015"
+             lower="${joint_limits['axis_a']['min_position']}"
+             upper="${joint_limits['axis_a']['max_position']}"
              velocity="10" />
     </joint>
 

@@ -21,6 +21,8 @@
              default="world" />
   <xacro:arg name="controllers_file"
              default="$(find reach_description)/config/alpha_5/controllers.yaml" />
+  <xacro:arg name="joint_limits_file"
+             default="$(find reach_description)/config/alpha_5/joint_limits.yaml" />
   <xacro:arg name="mount_rotation"
              default="0" />
 
@@ -38,7 +40,8 @@
 
   <!-- arm -->
   <xacro:alpha_5_urdf parent="$(arg parent)"
-                      prefix="${prefix}">
+                      prefix="${prefix}"
+                      joint_limits_file="$(arg joint_limits_file)">
     <origin xyz="0.0374 0 0.0225"
             rpy="$(arg mount_rotation) 0 0" />
   </xacro:alpha_5_urdf>
@@ -53,6 +56,7 @@
   <xacro:alpha_5_system prefix="${prefix}"
                         serial_port="$(arg serial_port)"
                         initial_positions_file="$(arg initial_positions_file)"
+                        joint_limits_file="$(arg joint_limits_file)"
                         use_sim="${use_sim}"
                         use_mock_hardware="$(arg use_mock_hardware)" />
 
