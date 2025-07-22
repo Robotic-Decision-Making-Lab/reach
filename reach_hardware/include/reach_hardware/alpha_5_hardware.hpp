@@ -50,7 +50,8 @@ namespace reach::hardware
 class Alpha5Hardware : public hardware_interface::SystemInterface
 {
 public:
-  auto on_init(const hardware_interface::HardwareInfo & info) -> hardware_interface::CallbackReturn override;
+  auto on_init(const hardware_interface::HardwareComponentInterfaceParams & info)
+    -> hardware_interface::CallbackReturn override;
 
   auto on_configure(const rclcpp_lifecycle::State & previous_state) -> hardware_interface::CallbackReturn override;
 

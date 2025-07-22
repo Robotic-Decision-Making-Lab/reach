@@ -30,19 +30,19 @@ target_sources(
         src/udp_driver.cpp
     PUBLIC
         FILE_SET HEADERS
-        BASE_DIRS ${CMAKE_CURRENT_SOURCE_DIR}/include
-        FILES
-            ${CMAKE_CURRENT_SOURCE_DIR}/include/libreach/client.hpp
-            ${CMAKE_CURRENT_SOURCE_DIR}/include/libreach/device_id.hpp
-            ${CMAKE_CURRENT_SOURCE_DIR}/include/libreach/driver.hpp
-            ${CMAKE_CURRENT_SOURCE_DIR}/include/libreach/mode.hpp
-            ${CMAKE_CURRENT_SOURCE_DIR}/include/libreach/packet_id.hpp
-            ${CMAKE_CURRENT_SOURCE_DIR}/include/libreach/packet.hpp
-            ${CMAKE_CURRENT_SOURCE_DIR}/include/libreach/serial_client.hpp
-            ${CMAKE_CURRENT_SOURCE_DIR}/include/libreach/serial_driver.hpp
-            ${CMAKE_CURRENT_SOURCE_DIR}/include/libreach/udp_client.hpp
-            ${CMAKE_CURRENT_SOURCE_DIR}/include/libreach/udp_driver.hpp
-            ${CMAKE_CURRENT_SOURCE_DIR}/include/libreach/version.hpp
+            BASE_DIRS ${CMAKE_CURRENT_SOURCE_DIR}/include
+            FILES
+                ${CMAKE_CURRENT_SOURCE_DIR}/include/libreach/client.hpp
+                ${CMAKE_CURRENT_SOURCE_DIR}/include/libreach/device_id.hpp
+                ${CMAKE_CURRENT_SOURCE_DIR}/include/libreach/driver.hpp
+                ${CMAKE_CURRENT_SOURCE_DIR}/include/libreach/mode.hpp
+                ${CMAKE_CURRENT_SOURCE_DIR}/include/libreach/packet_id.hpp
+                ${CMAKE_CURRENT_SOURCE_DIR}/include/libreach/packet.hpp
+                ${CMAKE_CURRENT_SOURCE_DIR}/include/libreach/serial_client.hpp
+                ${CMAKE_CURRENT_SOURCE_DIR}/include/libreach/serial_driver.hpp
+                ${CMAKE_CURRENT_SOURCE_DIR}/include/libreach/udp_client.hpp
+                ${CMAKE_CURRENT_SOURCE_DIR}/include/libreach/udp_driver.hpp
+                ${CMAKE_CURRENT_SOURCE_DIR}/include/libreach/version.hpp
 )
 
 target_compile_features(libreach PUBLIC cxx_std_23)

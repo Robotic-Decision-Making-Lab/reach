@@ -6,6 +6,7 @@ each of the Reach Robotics devices.
 ## Reach Alpha 5 Launch
 
 * alpha_5.launch.yaml
+* alpha_5_minimal.launch.yaml
 
 ### Examples
 
@@ -19,6 +20,12 @@ each of the Reach Robotics devices.
 
   ```bash
   ros2 launch reach_bringup alpha_5.launch.yaml use_sim:=true
+  ```
+
+* For minimal installations without Gazebo or RViz, launch the system with
+
+  ```bash
+  ros2 launch reach_bringup alpha_5_minimal.launch.yaml
   ```
 
 ## Micro IP Camera Launch
