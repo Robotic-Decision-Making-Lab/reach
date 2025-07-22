@@ -106,10 +106,10 @@ protected:
   realtime_tools::RealtimeBuffer<reach_msgs::msg::MultiDOFImpedanceCommand> reference_;
   std::shared_ptr<rclcpp::Subscription<reach_msgs::msg::MultiDOFImpedanceCommand>> reference_sub_;
 
-  std::shared_ptr<rclcpp::Publisher<reach_msgs::msg::MultiDOFImpedanceStateStamped>> controller_state_pub_;
-  std::unique_ptr<realtime_tools::RealtimePublisher<reach_msgs::msg::MultiDOFImpedanceStateStamped>>
-    rt_controller_state_pub_;
-  reach_msgs::msg::MultiDOFImpedanceStateStamped controller_state_;
+  using ControllerState = reach_msgs::msg::MultiDOFImpedanceStateStamped;
+  std::shared_ptr<rclcpp::Publisher<ControllerState>> controller_state_pub_;
+  std::unique_ptr<realtime_tools::RealtimePublisher<ControllerState>> rt_controller_state_pub_;
+  ControllerState controller_state_;
 
   std::shared_ptr<impedance_controller::ParamListener> param_listener_;
   impedance_controller::Params params_;

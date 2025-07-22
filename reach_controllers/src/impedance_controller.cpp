@@ -112,12 +112,9 @@ auto ImpedanceController::on_configure(const rclcpp_lifecycle::State & /*previou
       reference_.writeFromNonRT(*msg);
     });
 
-  controller_state_pub_ = get_node()->create_publisher<reach_msgs::msg::MultiDOFImpedanceStateStamped>(
-    "~/status", rclcpp::SystemDefaultsQoS());
-
+  controller_state_pub_ = get_node()->create_publisher<ControllerState>("~/status", rclcpp::SystemDefaultsQoS());
   rt_controller_state_pub_ =
-    std::make_unique<realtime_tools::RealtimePublisher<reach_msgs::msg::MultiDOFImpedanceStateStamped>>(
-      controller_state_pub_);
+    std::make_unique<realtime_tools::RealtimePublisher<ControllerState>>(controller_state_pub_);
 
   auto p_terms = controller_gains_ | std::views::transform([](const auto & gains) { return gains.damping; });
   auto d_terms = controller_gains_ | std::views::transform([](const auto & gains) { return gains.stiffness; });
