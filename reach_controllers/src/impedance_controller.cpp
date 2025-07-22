@@ -123,21 +123,21 @@ auto ImpedanceController::on_configure(const rclcpp_lifecycle::State & /*previou
   auto d_terms = controller_gains_ | std::views::transform([](const auto & gains) { return gains.stiffness; });
   auto ff_terms = controller_gains_ | std::views::transform([](const auto & gains) { return gains.friction; });
 
-  controller_state_msg_.dof_names = joint_names_;
-  controller_state_msg_.dof_names = joint_names_;
-  controller_state_msg_.torques.resize(num_joints_, std::numeric_limits<double>::quiet_NaN());
-  controller_state_msg_.position_errors.resize(num_joints_, std::numeric_limits<double>::quiet_NaN());
-  controller_state_msg_.velocity_errors.resize(num_joints_, std::numeric_limits<double>::quiet_NaN());
-  controller_state_msg_.outputs.resize(num_joints_, std::numeric_limits<double>::quiet_NaN());
+  controller_state_.dof_names = joint_names_;
+  controller_state_.dof_names = joint_names_;
+  controller_state_.torques.resize(num_joints_, std::numeric_limits<double>::quiet_NaN());
+  controller_state_.position_errors.resize(num_joints_, std::numeric_limits<double>::quiet_NaN());
+  controller_state_.velocity_errors.resize(num_joints_, std::numeric_limits<double>::quiet_NaN());
+  controller_state_.outputs.resize(num_joints_, std::numeric_limits<double>::quiet_NaN());
 
-  controller_state_msg_.p_terms.clear();
-  std::ranges::copy(p_terms, std::back_inserter(controller_state_msg_.p_terms));
+  controller_state_.p_terms.clear();
+  std::ranges::copy(p_terms, std::back_inserter(controller_state_.p_terms));
 
-  controller_state_msg_.d_terms.clear();
-  std::ranges::copy(d_terms, std::back_inserter(controller_state_msg_.d_terms));
+  controller_state_.d_terms.clear();
+  std::ranges::copy(d_terms, std::back_inserter(controller_state_.d_terms));
 
-  controller_state_msg_.friction_terms.clear();
-  std::ranges::copy(ff_terms, std::back_inserter(controller_state_msg_.friction_terms));
+  controller_state_.friction_terms.clear();
+  std::ranges::copy(ff_terms, std::back_inserter(controller_state_.friction_terms));
 
   return controller_interface::CallbackReturn::SUCCESS;
 }
@@ -281,24 +281,24 @@ auto ImpedanceController::update_and_write_commands(const rclcpp::Time & time, c
     }
   }
 
-  controller_state_msg_.header.stamp = time;
+  controller_state_.header.stamp = time;
 
   for (std::size_t i = 0; i < num_joints_; ++i) {
-    controller_state_msg_.torques[i] = reference_interfaces_[(2 * num_joints_) + i];
-    controller_state_msg_.position_errors[i] = position_error_[i];
-    controller_state_msg_.velocity_errors[i] = velocity_error_[i];
-    controller_state_msg_.p_terms[i] = controller_gains_[i].damping;
-    controller_state_msg_.d_terms[i] = controller_gains_[i].stiffness;
-    controller_state_msg_.friction_terms[i] = controller_gains_[i].friction;
+    controller_state_.torques[i] = reference_interfaces_[(2 * num_joints_) + i];
+    controller_state_.position_errors[i] = position_error_[i];
+    controller_state_.velocity_errors[i] = velocity_error_[i];
+    controller_state_.p_terms[i] = controller_gains_[i].damping;
+    controller_state_.d_terms[i] = controller_gains_[i].stiffness;
+    controller_state_.friction_terms[i] = controller_gains_[i].friction;
     const auto out = command_interfaces_[i].get_optional();
     if (!out.has_value()) {
       std::cerr << "Failed to get command interface value for joint " << joint_names_[i] << "\n";
       return controller_interface::return_type::ERROR;
     }
-    controller_state_msg_.outputs[i] = out.value();
+    controller_state_.outputs[i] = out.value();
   }
 
-  rt_controller_state_pub_->try_publish(controller_state_msg_);
+  rt_controller_state_pub_->try_publish(controller_state_);
 
   return controller_interface::return_type::OK;
 }
