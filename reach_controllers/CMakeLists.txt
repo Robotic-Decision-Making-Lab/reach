@@ -7,19 +7,13 @@ endif()
 
 include(GNUInstallDirs)
 
-set(THIS_PACKAGE_INCLUDE_DEPENDS
-    controller_interface
-    hardware_interface
-    pluginlib
-    generate_parameter_library
-    realtime_tools
-    reach_msgs
-)
-
+find_package(controller_interface REQUIRED)
+find_package(hardware_interface REQUIRED)
+find_package(pluginlib REQUIRED)
+find_package(generate_parameter_library REQUIRED)
+find_package(realtime_tools REQUIRED)
+find_package(reach_msgs REQUIRED)
 find_package(ament_cmake REQUIRED)
-foreach(Dependency IN ITEMS ${THIS_PACKAGE_INCLUDE_DEPENDS})
-    find_package(${Dependency} REQUIRED)
-endforeach()
 
 generate_parameter_library(impedance_controller_parameters
   src/impedance_controller_parameters.yaml
@@ -31,13 +25,23 @@ target_sources(
     PRIVATE src/impedance_controller.cpp
     PUBLIC
         FILE_SET HEADERS
-        BASE_DIRS ${CMAKE_CURRENT_SOURCE_DIR}/include
-        FILES
-            ${CMAKE_CURRENT_SOURCE_DIR}/include/reach_controllers/impedance_controller.hpp
+            BASE_DIRS ${CMAKE_CURRENT_SOURCE_DIR}/include
+            FILES
+                ${CMAKE_CURRENT_SOURCE_DIR}/include/reach_controllers/impedance_controller.hpp
 )
 target_compile_features(reach_controllers PUBLIC cxx_std_20)
-target_link_libraries(reach_controllers PUBLIC impedance_controller_parameters)
-ament_target_dependencies(reach_controllers PUBLIC ${THIS_PACKAGE_INCLUDE_DEPENDS})
+target_link_libraries(
+    reach_controllers
+    PUBLIC
+        impedance_controller_parameters
+        controller_interface::controller_interface
+        hardware_interface::hardware_interface
+        hardware_interface::mock_components
+        pluginlib::pluginlib
+        realtime_tools::realtime_tools
+        realtime_tools::thread_priority
+        ${reach_msgs_TARGETS}
+)
 
 pluginlib_export_plugin_description_file(controller_interface reach_controllers.xml)
 
@@ -51,6 +55,13 @@ install(
 )
 
 ament_export_targets(export_reach_controllers HAS_LIBRARY_TARGET)
-ament_export_dependencies(${THIS_PACKAGE_INCLUDE_DEPENDS})
+ament_export_dependencies(
+  "controller_interface"
+  "hardware_interface"
+  "pluginlib"
+  "generate_parameter_library"
+  "realtime_tools"
+  "reach_msgs"
+)
 
 ament_package()

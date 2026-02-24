@@ -7,19 +7,12 @@ endif()
 
 include(GNUInstallDirs)
 
-set(THIS_PACKAGE_INCLUDE_DEPENDS
-    rclcpp
-    geometry_msgs
-    rclcpp_components
-    cv_bridge
-    camera_info_manager
-    image_transport
-)
-
-foreach(pkg IN ITEMS ${THIS_PACKAGE_INCLUDE_DEPENDS})
-    find_package(${pkg} REQUIRED)
-endforeach()
-
+find_package(rclcpp REQUIRED)
+find_package(geometry_msgs REQUIRED)
+find_package(rclcpp_components REQUIRED)
+find_package(cv_bridge REQUIRED)
+find_package(camera_info_manager REQUIRED)
+find_package(image_transport REQUIRED)
 find_package(ament_cmake REQUIRED)
 find_package(generate_parameter_library REQUIRED)
 
@@ -38,9 +31,9 @@ target_sources(
     PRIVATE src/gstreamer_proxy.cpp
     PUBLIC
         FILE_SET HEADERS
-        BASE_DIRS ${CMAKE_CURRENT_SOURCE_DIR}/include
-        FILES
-            ${CMAKE_CURRENT_SOURCE_DIR}/include/reach_ip_camera/gstreamer_proxy.hpp
+            BASE_DIRS ${CMAKE_CURRENT_SOURCE_DIR}/include
+            FILES
+                ${CMAKE_CURRENT_SOURCE_DIR}/include/reach_ip_camera/gstreamer_proxy.hpp
 )
 target_link_libraries(
     gstreamer_proxy_library
@@ -48,8 +41,18 @@ target_link_libraries(
     PUBLIC PkgConfig::gstreamer
     PUBLIC PkgConfig::gstreamer-app
 )
-ament_target_dependencies(gstreamer_proxy_library PUBLIC ${THIS_PACKAGE_INCLUDE_DEPENDS})
 target_compile_features(gstreamer_proxy_library PUBLIC cxx_std_20)
+target_link_libraries(
+    gstreamer_proxy_library
+    PUBLIC
+        camera_info_manager::camera_info_manager
+        cv_bridge::cv_bridge
+        image_transport::image_transport
+        rclcpp::rclcpp
+        rclcpp_components::component
+        rclcpp_components::component_manager
+        ${geometry_msgs_TARGETS}
+)
 
 rclcpp_components_register_node(gstreamer_proxy_library
     PLUGIN "reach::GStreamerProxy"
@@ -66,6 +69,13 @@ install(
 )
 
 ament_export_targets(export_gstreamer_proxy_library HAS_LIBRARY_TARGET)
-ament_export_dependencies($THIS_PACKAGE_INCLUDE_DEPENDS)
+ament_export_dependencies(
+  "rclcpp"
+  "geometry_msgs"
+  "rclcpp_components"
+  "cv_bridge"
+  "camera_info_manager"
+  "image_transport"
+)
 
 ament_package()

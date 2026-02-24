@@ -77,7 +77,8 @@ auto validate_interfaces(
 
 }  // namespace
 
-auto Alpha5Hardware::on_init(const hardware_interface::HardwareInfo & info) -> hardware_interface::CallbackReturn
+auto Alpha5Hardware::on_init(const hardware_interface::HardwareComponentInterfaceParams & info)
+  -> hardware_interface::CallbackReturn
 {
   RCLCPP_INFO(logger_, "Initializing Alpha5Hardware system interface");
 
